@@ -1,0 +1,15 @@
+{
+  "name": "ESP8266TimerInterrupt",
+  "keywords": "timer,interrupt,hardware",
+  "description": "Library for ESP8266 built-in Hardware Timers",
+  "repository":
+  {
+    "type": "git",
+    "url": "//https://github.com/khoih-prog/ESP8266TimerInterrupt"
+  },
+  "frameworks": "arduino",
+  "platforms":
+  [
+    "esp8266"
+  ]
+}
