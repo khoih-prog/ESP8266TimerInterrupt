@@ -47,40 +47,12 @@ enum TIM_DIV_ENUM {
   TIM_DIV256 = 3  // 312.5 / 625 Khz (1 tick = 3.2 / 1.6 us - 26843542.4 us max)
 };
 
-
 //timer int_types
 #define TIM_EDGE	0
 #define TIM_LEVEL	1
 //timer reload values
 #define TIM_SINGLE	0 //on interrupt routine you need to write a new value to start the timer again
 #define TIM_LOOP	1 //on interrupt the counter will start with the same value again
-
-#define timer1_read()           (T1V)
-#define timer1_enabled()        ((T1C & (1 << TCTE)) != 0)
-#define timer1_interrupted()    ((T1C & (1 << TCIS)) != 0)
-
-typedef void(*timercallback)(void);
-
-void timer1_isr_init(void);
-void timer1_enable(uint8_t divider, uint8_t int_type, uint8_t reload);
-void timer1_disable(void);
-void timer1_attachInterrupt(timercallback userFunc);
-void timer1_detachInterrupt(void);
-void timer1_write(uint32_t ticks); //maximum ticks 8388607
-
-// timer0 is a special CPU timer that has very high resolution but with
-// limited control.
-// it uses CCOUNT (ESP.GetCycleCount()) as the non-resetable timer counter
-// it does not support divide, type, or reload flags
-// it is auto-disabled when the compare value matches CCOUNT
-// it is auto-enabled when the compare value changes
-#define timer0_interrupted()    (ETS_INTR_PENDING() & (_BV(ETS_COMPARE0_INUM)))
-#define timer0_read() ((__extension__({uint32_t count;__asm__ __volatile__("esync; rsr %0,ccompare0":"=a" (count));count;})))
-#define timer0_write(count) __asm__ __volatile__("wsr %0,ccompare0; esync"::"a" (count) : "memory")
-
-void timer0_isr_init(void);
-void timer0_attachInterrupt(timercallback userFunc);
-void timer0_detachInterrupt(void);
 
 */
 
