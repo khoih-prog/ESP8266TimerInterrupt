@@ -5,7 +5,7 @@
  * 
  * Built by Khoi Hoang https://github.com/khoih-prog/ESP8266TimerInterrupt
  * Licensed under MIT license
- * Version: v1.0.0
+ * Version: v1.0.1
  * 
  * Notes:
  * Special design is necessary to share data between interrupt code and the rest of your program.
@@ -47,7 +47,7 @@ ESP8266Timer ITimer;
 volatile bool SWPressed     = false;
 volatile bool SWLongPressed = false;
 
-void IRAM_ATTR TimerHandler()
+void ICACHE_RAM_ATTR TimerHandler()
 {
   static unsigned int debounceCountSWPressed  = 0;
   static unsigned int debounceCountSWReleased = 0;

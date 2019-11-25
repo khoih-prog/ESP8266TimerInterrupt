@@ -5,7 +5,7 @@
  * 
  * Built by Khoi Hoang https://github.com/khoih-prog/ESP32TimerInterrupt
  * Licensed under MIT license
- * Version: v1.0.0
+ * Version: v1.0.1
  * 
  * Notes:
  * Special design is necessary to share data between interrupt code and the rest of your program.
@@ -24,12 +24,12 @@
 #include "ESP8266TimerInterrupt.h"
 
 #ifndef LED_BUILTIN
-#define LED_BUILTIN       2         // Pin D2 mapped to pin GPIO2/ADC12 of ESP32, control on-board LED
+#define LED_BUILTIN       2         // Pin D4 mapped to pin GPIO2/TXD1 of ESP8266, NodeMCU and WeMoS, control on-board LED
 #endif
 
 volatile uint32_t lastMillis = 0;
 
-void IRAM_ATTR TimerHandler(void)
+void ICACHE_RAM_ATTR TimerHandler(void)
 {
   static bool toggle = false;
   static bool started = false;

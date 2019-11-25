@@ -5,7 +5,7 @@
  * 
  * Built by Khoi Hoang https://github.com/khoih-prog/ESP8266TimerInterrupt
  * Licensed under MIT license
- * Version: v1.0.0
+ * Version: v1.0.1
  * 
  * Notes:
  * Special design is necessary to share data between interrupt code and the rest of your program.
@@ -25,7 +25,7 @@
 
 #include "ESP8266TimerInterrupt.h"
 
-#define BUILTIN_LED     2  //On board LED
+#define BUILTIN_LED     2       // Pin D4 mapped to pin GPIO2/TXD1 of ESP8266, NodeMCU and WeMoS, control on-board LED
 
 volatile bool statusLed = false;
 volatile uint32_t lastMillis = 0;

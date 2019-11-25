@@ -5,16 +5,17 @@
  * 
  * Built by Khoi Hoang https://github.com/khoih-prog/ESP32TimerInterrupt
  * Licensed under MIT license
- * Version: 1.0.0
- * The ESP32 has two timer groups, each one with two general purpose hardware timers. All the timers   
- * are based on 64 bits counters and 16 bit prescalers
- * The timer counters can be configured to count up or down and support automatic reload and software reload 
- * They can also generate alarms when they reach a specific value, defined by the software. 
- * The value of the counter can be read by the software program.
+ * Version: 1.0.1
+ *
+ * The ESP8266 timers are badly designed, using only 23-bit counter along with maximum 256 prescaler. They're only better than UNO / Mega.
+ * The ESP8266 has two hardware timers, but timer0 has been used for WiFi and it's not advisable to use. Only timer1 is available.
+ * The timer1's 23-bit counter terribly can count only up to 8,388,607. So the timer1 maximum interval is very short.
+ * Using 256 prescaler, maximum timer1 interval is only 26.843542 seconds !!!
  *
  * Version Modified By   Date      Comments
  * ------- -----------  ---------- -----------
  *  1.0.0   K Hoang      23/11/2019 Initial coding
+ *  1.0.1   K Hoang      25/11/2019 New release fixing compiler error
 ****************************************************************************************/
 
 #ifndef ESP8266TimerInterrupt_h

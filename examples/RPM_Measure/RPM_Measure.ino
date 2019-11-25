@@ -5,7 +5,7 @@
  * 
  * Built by Khoi Hoang https://github.com/khoih-prog/ESP8266TimerInterrupt
  * Licensed under MIT license
- * Version: v1.0.0
+ * Version: v1.0.1
  * 
  * Notes:
  * Special design is necessary to share data between interrupt code and the rest of your program.
@@ -54,7 +54,7 @@ float avgRPM    = 0.00;
 
 volatile int debounceCounter;
 
-void IRAM_ATTR TimerHandler()
+void ICACHE_RAM_ATTR TimerHandler()
 {  
   static bool started = false;
 

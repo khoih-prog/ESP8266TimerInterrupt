@@ -5,7 +5,7 @@
  * 
  * Built by Khoi Hoang https://github.com/khoih-prog/ESP8266TimerInterrupt
  * Licensed under MIT license
- * Version: v1.0.0
+ * Version: v1.0.1
  * 
  * Notes:
  * Special design is necessary to share data between interrupt code and the rest of your program.
@@ -55,12 +55,12 @@ volatile int debounceCounter;
 
 volatile bool activeState = false;
 
-void IRAM_ATTR detectRotation(void)
+void ICACHE_RAM_ATTR detectRotation(void)
 {
   activeState = true;
 }
 
-void IRAM_ATTR TimerHandler()
+void ICACHE_RAM_ATTR TimerHandler()
 {  
   static bool started = false;
 
@@ -111,7 +111,7 @@ void setup()
   pinMode(interruptPin, INPUT_PULLUP);  
 
   // Interval in microsecs
-  if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS, TimerHandler))
+  if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 1000, TimerHandler))
     Serial.println("Starting  ITimer OK, millis() = " + String(millis()));
   else
     Serial.println("Can't set ITimer. Select another freq. or interval");
