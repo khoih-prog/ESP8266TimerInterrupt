@@ -118,7 +118,7 @@ void loop()
 For current version v1.0.1
 
 1. Basic hardware timers for ESP8266.
-2. Fix compability issue causing compiler error while using Arduino IDEs before 1.8.10 and ESP8266 cores 2.5.2 and before
+2. Fix compatibility issue causing compiler error while using Arduino IDEs before 1.8.10 and ESP8266 cores 2.5.2 and before
 
 
 ## Contributing
