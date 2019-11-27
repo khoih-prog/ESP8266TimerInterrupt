@@ -40,6 +40,21 @@ Using 256 prescaler, maximum timer1 interval is only 26.843542 seconds !!!
 
 The timer1 counters can be configured to support automatic reload.
 
+## New from v1.0.2
+
+Now with these new `16 ISR-based timers`, the maximum interval is practically unlimited (limited only by unsigned long miliseconds)
+The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
+Therefore, their executions are not blocked by bad-behaving functions / tasks.
+This important feature is absolutely necessary for mission-critical tasks. 
+
+The `ISR_Timer_Complex` example will demonstrate the nearly perfect accuracy compared to software timers by printing the actual 
+elapsed millisecs of each type of timers.
+Being ISR-based timers, their executions are not blocked by bad-behaving functions / tasks, such as connecting to WiFi, Internet
+and Blynk services. You can also have many `(up to 16)` timers to use.
+This non-being-blocked important feature is absolutely necessary for mission-critical tasks. 
+You'll see blynkTimer Software is blocked while system is connecting to WiFi / Internet / Blynk, as well as by blocking task 
+in loop(), using delay() function as an example. The elapsed time then is very unaccurate
+
 ## Supported Boards
 
 - ESP8266
@@ -109,16 +124,18 @@ void loop()
 ```
 ## TO DO
 
-1. More hardware-initiated software-enabled timers
-2. Longer time interval
+1. Search for bug and improvement.
+2. Similar features for Arduino (UNO, Mega, etc...) and ESP32 
 
 
 ## DONE
 
-For current version v1.0.1
+For current version v1.0.2
 
 1. Basic hardware timers for ESP8266.
 2. Fix compatibility issue causing compiler error while using Arduino IDEs before 1.8.10 and ESP8266 cores 2.5.2 and before
+3. More hardware-initiated software-enabled timers
+4. Longer time interval
 
 
 ## Contributing
