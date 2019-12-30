@@ -1,5 +1,7 @@
 # ESP8266 TimerInterrupt Library
 
+[![arduino-library-badge](https://www.ardu-badge.com/badge/ESP8266TimerInterrupt.svg?)](https://www.ardu-badge.com/ESP8266TimerInterrupt)
+
 This library enables you to use Interrupt from Hardware Timers on an ESP8266-based board.
 
 Why do we need this Hardware Timer Interrupt?
