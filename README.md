@@ -20,15 +20,21 @@ Functions using normal software timers, relying on loop() and calling millis(), 
 
 The catch is your function is now part of an ISR (Interrupt Service Routine), and must be lean / mean, and follow certain rules. More to read on:
 
-https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/
+[Attach Interrupt](https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/)
 
 **Important Notes:**
 1. Inside the attached function, delay() won’t work and the value returned by millis() will not increment. Serial data received while in the function may be lost. You should declare as volatile any variables that you modify within the attached function.
 
 2. Typically global variables are used to pass data between an ISR and the main program. To make sure variables shared between an ISR and the main program are updated correctly, declare them as volatile.
 
-## Installation
-1. Navigate to (https://github.com/khoih-prog/ESP8266TimerInterrupt) page.
+### Installation
+
+#### Use Arduino Library Manager
+
+The suggested and easiest way is to use `Arduino Library Manager`. Search for `ESP8266TimerInterrupt`, then select / install the latest version.
+
+#### Manual Install
+1. Navigate to [ESP8266TimerInterrupt](https://github.com/khoih-prog/ESP8266TimerInterrupt).
 2. Download the latest release `ESP8266TimerInterrupt-master.zip`.
 3. Extract the zip file to `ESP8266TimerInterrupt-master` directory 
 4. Copy whole folder to Arduino libraries' directory such as `.Arduino/libraries/ESP8266TimerInterrupt-master`.
@@ -127,8 +133,6 @@ void loop()
 ## TO DO
 
 1. Search for bug and improvement.
-2. Similar features for Arduino (UNO, Mega, etc...) and ESP32 
-
 
 ## DONE
 
@@ -138,6 +142,7 @@ For current version v1.0.2
 2. Fix compatibility issue causing compiler error while using Arduino IDEs before 1.8.10 and ESP8266 cores 2.5.2 and before
 3. More hardware-initiated software-enabled timers
 4. Longer time interval
+5. Similar features for Arduino (UNO, Mega, etc...) and ESP32
 
 
 ## Contributing
