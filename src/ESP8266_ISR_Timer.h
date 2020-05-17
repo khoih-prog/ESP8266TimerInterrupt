@@ -5,7 +5,7 @@
 
    Built by Khoi Hoang https://github.com/khoih-prog/ESP8266TimerInterrupt
    Licensed under MIT license
-   Version: 1.0.2
+   Version: 1.0.3
 
    The ESP8266 timers are badly designed, using only 23-bit counter along with maximum 256 prescaler. They're only better than UNO / Mega.
    The ESP8266 has two hardware timers, but timer0 has been used for WiFi and it's not advisable to use. Only timer1 is available.
@@ -29,11 +29,16 @@
     1.0.0   K Hoang      23/11/2019 Initial coding
     1.0.1   K Hoang      25/11/2019 New release fixing compiler error
     1.0.2   K.Hoang      26/11/2019 Permit up to 16 super-long-time, super-accurate ISR-based timers to avoid being blocked
+    1.0.3   K.Hoang      17/05/2020 Restructure code. Fix example. Enhance README.
 *****************************************************************************************************************************/
 
 
 #ifndef ESP8266_ISR_TIMER_H
 #define ESP8266_ISR_TIMER_H
+
+#if !defined(ESP8266)
+#error This code is designed to run on ESP8266 and ESP8266-based boards! Please check your Tools->Board setting.
+#endif
 
 #include <stddef.h>
 #ifdef ESP8266
@@ -60,7 +65,8 @@ extern "C"
 typedef void (*timer_callback)(void);
 typedef void (*timer_callback_p)(void *);
 
-class ESP8266_ISR_Timer {
+class ESP8266_ISR_Timer 
+{
 
   public:
     // maximum number of timers
@@ -140,7 +146,8 @@ class ESP8266_ISR_Timer {
     unsigned ICACHE_RAM_ATTR getNumTimers();
 
     // returns the number of available timers
-    unsigned ICACHE_RAM_ATTR getNumAvailableTimers() {
+    unsigned ICACHE_RAM_ATTR getNumAvailableTimers() 
+    {
       return MAX_TIMERS - numTimers;
     };
 
@@ -158,7 +165,8 @@ class ESP8266_ISR_Timer {
     // find the first available slot
     int ICACHE_RAM_ATTR findFirstFreeSlot();
 
-    typedef struct {
+    typedef struct 
+    {
       unsigned long prev_millis;        // value returned by the millis() function in the previous run() call
       void* callback;                   // pointer to the callback function
       void* param;                      // function parameter
@@ -175,5 +183,7 @@ class ESP8266_ISR_Timer {
     // actual number of timers in use (-1 means uninitialized)
     volatile int numTimers;
 };
+
+#include "ESP8266_ISR_Timer-Impl.h"
 
 #endif

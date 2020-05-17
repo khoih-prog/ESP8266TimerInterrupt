@@ -1,15 +1,28 @@
 {
   "name": "ESP8266TimerInterrupt",
-  "keywords": "timer,interrupt,hardware",
-  "description": "Library for ESP8266 built-in Hardware Timers",
+  "version": "1.0.3",
+  "keywords": "timer,interrupt,hardware,ESP8266,mission-critical,precise,non-blocking",
+  "description": "This library enables you to use Interrupt from Hardware Timers on an ESP8266-based board. These hardware timers, using interrupt, still work even if other functions are blocking. Moreover, they are much more precise (certainly depending on clock frequency accuracy) than other software timers using millis() or micros(). That's necessary if you need to measure some data requiring better accuracy.",
+  "authors":
+  {
+    "name":  "Khoi Hoang",
+    "url":   "https://github.com/khoih-prog",
+    "maintainer": true
+  },
   "repository":
   {
     "type": "git",
     "url": "//https://github.com/khoih-prog/ESP8266TimerInterrupt"
   },
-  "frameworks": "arduino",
-  "platforms":
-  [
-    "esp8266"
-  ]
+  "homepage": "https://github.com/khoih-prog/ESP8266TimerInterrupt",
+  "export": {
+    "exclude": [
+      "linux",
+      "extras",
+      "tests"
+    ]
+  },
+  "frameworks": "*",
+  "platforms": "esp8266",
+  "examples": "examples/*/*/*.ino"
 }
