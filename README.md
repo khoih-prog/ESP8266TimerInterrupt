@@ -178,6 +178,50 @@ void loop()
 
 ```
 
+The following is the sample terminal output when running example [ISR_Timer_Complex](examples/ISR_Timer_Complex) to demonstrate the accuracy of ISR Hardware Timer, ***especially when system is very busy***.  The ISR timer is ***programmed for 2s, is activated exactly after 2.000s !!!***
+
+While software timer, ***programmed for 2s, is activated after 4.258s !!!***
+
+```
+Starting ISR_Timer_Complex
+ESP8266TimerInterrupt: _fre = 312500.00, _count = 15625
+Starting  ITimer OK, millis() = 64
+doingSomething2s: Delta ms = 2000   // ISR_Timer, 2000ms interval, still working even if blocked by WiFi/Blynk connecting tasks
+doingSomething2s: Delta ms = 2000
+doingSomething5s: Delta ms = 5000
+Delta ms = 5000                     //ISR_Timer, 5000ms interval, blynking an LED
+doingSomething2s: Delta ms = 2000
+[6159] 
+    ___  __          __
+   / _ )/ /_ _____  / /__
+  / _  / / // / _ \/  '_/
+ /____/_/\_, /_//_/_/\_\
+        /___/ v0.6.1 on NodeMCU
+
+[6161] Protocol connect: timeout =9000
+[6164] Connecting to ****.duckdns.org:8080
+[6255] Ready (ping: 5ms).
+Blynk connected
+doingSomething2s: Delta ms = 2000  <=== ISR Timer still very accurate while system busy
+blynkDoingSomething2s: Delta programmed ms = 2000, actual = 4258  //Software Timer, 2000ms interval, blocked by WiFi/Blynk connecting tasks
+doingSomething2s: Delta ms = 2000
+doingSomething5s: Delta ms = 5000
+doingSomething10s: Delta ms = 5000
+Delta ms = 5000
+doingSomething2s: Delta ms = 2000
+blynkDoingSomething2s: Delta programmed ms = 2000, actual = 3000  //Software Timer, 2000ms interval, blocked by delay() in loop() to demonstrate bad task.
+doingSomething2s: Delta ms = 2000
+doingSomething5s: Delta ms = 5000
+Delta ms = 5000
+blynkDoingSomething2s: Delta programmed ms = 2000, actual = 3001 <=== Software Timer not accurate when system busy
+doingSomething2s: Delta ms = 2000
+doingSomething2s: Delta ms = 2000
+blynkDoingSomething2s: Delta programmed ms = 2000, actual = 3000 <=== Software Timer not accurate when system busy
+doingSomething2s: Delta ms = 2000
+doingSomething5s: Delta ms = 5000
+doingSomething10s: Delta ms = 10000
+```
+
 ### Releases v1.0.3
 
 1. Restructure code.
