@@ -106,15 +106,15 @@ ESP8266Timer ITimer;
 
 // If local server
 #if USE_LOCAL_SERVER
-char blynk_server[]   = "khoih.duckdns.org";
+char blynk_server[]   = "account.duckdns.org";
 //char blynk_server[]   = "192.168.2.110";
 #else
 char blynk_server[]   = "";
 #endif
 
-char auth[]     = "un9Sv8k1q5xKpl5Lihs7a22Ixeq8MJ2J";
-char ssid[]     = "HueNet1";
-char pass[]     = "jenniqqs";
+char auth[]     = "****";
+char ssid[]     = "****";
+char pass[]     = "****";
 
 #endif
 
