@@ -6,6 +6,9 @@
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](#Contributing)
 [![GitHub issues](https://img.shields.io/github/issues/khoih-prog/ESP8266TimerInterrupt.svg)](http://github.com/khoih-prog/ESP8266TimerInterrupt/issues)
 
+---
+---
+
 ### Releases v1.0.3
 
 1. Restructure code.
@@ -18,6 +21,9 @@
 2. Fix compatibility issue causing compiler error while using Arduino IDEs before 1.8.10 and ESP8266 cores 2.5.2 and before
 3. More hardware-initiated software-enabled timers
 4. Longer time interval
+
+---
+---
 
 ## Features
 
@@ -41,32 +47,46 @@ The catch is ***your function is now part of an ISR (Interrupt Service Routine),
 
 [Howto Attach Interrupt](https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/)
 
+---
+
 #### Important Notes:
 
 1. Inside the attached function, ***delay() won’t work and the value returned by millis() will not increment.*** Serial data received while in the function may be lost. You should declare as ***volatile any variables that you modify within the attached function.***
 
 2. Typically global variables are used to pass data between an ISR and the main program. To make sure variables shared between an ISR and the main program are updated correctly, declare them as volatile.
 
+---
+---
+
 ## Prerequisite
-1. [`Arduino IDE 1.8.12 or later` for Arduino](https://www.arduino.cc/en/Main/Software)
-2. [`ESP8266 core 2.6.3 or later` for Arduino](https://github.com/esp8266/Arduino#installing-with-boards-manager) for ESP8266 boards.
+1. [`Arduino IDE 1.8.12+` for Arduino](https://www.arduino.cc/en/Main/Software)
+2. [`ESP8266 core 2.7.3+` for Arduino](https://github.com/esp8266/Arduino#installing-with-boards-manager) for ESP8266 boards.
 
-### Installation
+---
+---
 
-The suggested way to install is to:
+## Installation
 
-#### Use Arduino Library Manager
+### Use Arduino Library Manager
+The best and easiest way is to use `Arduino Library Manager`. Search for `ESP8266TimerInterrupt`, then select / install the latest version.
+You can also use this link [![arduino-library-badge](https://www.ardu-badge.com/badge/ESP8266TimerInterrupt.svg?)](https://www.ardu-badge.com/ESP8266TimerInterrupt) for more detailed instructions.
 
-The best way is to use `Arduino Library Manager`. Search for `ESP8266TimerInterrupt`, then select / install the latest version. You can also use this link [![arduino-library-badge](https://www.ardu-badge.com/badge/ESP8266TimerInterrupt.svg?)](https://www.ardu-badge.com/ESP8266TimerInterrupt) for more detailed instructions.
+### Manual Install
 
-#### Manual Install
+Another way to install is to:
 
 1. Navigate to [ESP8266TimerInterrupt](https://github.com/khoih-prog/ESP8266TimerInterrupt) page.
 2. Download the latest release `ESP8266TimerInterrupt-master.zip`.
 3. Extract the zip file to `ESP8266TimerInterrupt-master` directory 
-4. Copy whole 
-  - `ESP8266TimerInterrupt-master/src` folder to Arduino libraries' directory such as `~/Arduino/libraries/`.
-  
+4. Copy whole `ESP8266TimerInterrupt-master` folder to Arduino libraries' directory such as `~/Arduino/libraries/`.
+
+### VS Code & PlatformIO:
+1. Install [VS Code](https://code.visualstudio.com/)
+2. Install [PlatformIO](https://platformio.org/platformio-ide)
+3. Install **ESP8266TimerInterrupt** library by using [Library Manager](https://docs.platformio.org/en/latest/librarymanager/). Search for ESP8266TimerInterrupt in [Platform.io Author's Libraries](https://platformio.org/lib/search?query=author:%22Khoi%20Hoang%22)
+4. Use included [platformio.ini](platformio/platformio.ini) file from examples to ensure that all dependent libraries will installed automatically. Please visit documentation for the other options and examples at [Project Configuration File](https://docs.platformio.org/page/projectconf.html)
+
+---
 
 ## More useful Information
 
@@ -91,7 +111,10 @@ Being ISR-based timers, their executions are not blocked by bad-behaving functio
 
 You'll see blynkTimer Software is blocked while system is connecting to WiFi / Internet / Blynk, as well as by blocking task in loop(), using delay() function as an example. The elapsed time then is very unaccurate
 
-### Also see examples: 
+---
+---
+
+### Examples: 
 
  1. [Argument_None](examples/Argument_None)
  2. [ISR_RPM_Measure](examples/ISR_RPM_Measure)
@@ -103,6 +126,8 @@ You'll see blynkTimer Software is blocked while system is connecting to WiFi / I
  8. [RPM_Measure](examples/RPM_Measure)
  9. [SwitchDebounce](examples/SwitchDebounce)
 10. [TimerInterruptTest](examples/TimerInterruptTest)
+
+---
 
 ### Supported Boards
 
@@ -178,6 +203,9 @@ void loop()
 
 ```
 
+---
+
+
 The following is the sample terminal output when running example [ISR_Timer_Complex](examples/ISR_Timer_Complex) to demonstrate the accuracy of ISR Hardware Timer, ***especially when system is very busy***.  The ISR timer is ***programmed for 2s, is activated exactly after 2.000s !!!***
 
 While software timer, ***programmed for 2s, is activated after 4.258s !!!***
@@ -221,6 +249,8 @@ doingSomething2s: Delta ms = 2000
 doingSomething5s: Delta ms = 5000
 doingSomething10s: Delta ms = 10000
 ```
+---
+---
 
 ### Releases v1.0.3
 
@@ -243,6 +273,8 @@ doingSomething10s: Delta ms = 10000
 
 1. Initial coding
 
+---
+---
 
 ## TO DO
 
@@ -253,6 +285,7 @@ doingSomething10s: Delta ms = 10000
 
 1. Similar features for Arduino (UNO, Mega, etc...) and ESP32 
 
+---
 
 ### Contributions and thanks
 
@@ -263,6 +296,8 @@ If you want to contribute to this project:
 - Ask for enhancements
 - Create issues and pull requests
 - Tell other people about this library
+
+---
 
 ## Copyright
 Copyright 2019- Khoi Hoang
