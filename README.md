@@ -31,27 +31,27 @@ This library enables you to use Interrupt from Hardware Timers on an ESP8266-bas
 
 #### Why do we need this Hardware Timer Interrupt?
 
-Imagine you have a system with a ***mission-critical*** function, measuring water level and control the sump pump or doing something much more important. You normally use a software timer to poll, or even place the function in loop(). But what if another function is ***blocking*** the loop() or setup().
+Imagine you have a system with a **mission-critical** function, measuring water level and control the sump pump or doing something much more important. You normally use a software timer to poll, or even place the function in loop(). But what if another function is **blocking** the loop() or setup().
 
-So your function ***might not be executed, and the result would be disastrous.***
+So your function **might not be executed, and the result would be disastrous.**
 
 You'd prefer to have your function called, no matter what happening with other functions (busy loop, bug, etc.).
 
-The correct choice is to use a Hardware Timer with ***Interrupt*** to call your function.
+The correct choice is to use a Hardware Timer with **Interrupt** to call your function.
 
-These hardware timers, using interrupt, still work even if other functions are blocking. Moreover, they are much more ***precise*** (certainly depending on clock frequency accuracy) than other software timers using millis() or micros(). That's necessary if you need to measure some data requiring better accuracy.
+These hardware timers, using interrupt, still work even if other functions are blocking. Moreover, they are much more **precise** (certainly depending on clock frequency accuracy) than other software timers using millis() or micros(). That's necessary if you need to measure some data requiring better accuracy.
 
 Functions using normal software timers, relying on loop() and calling millis(), won't work if the loop() or setup() is blocked by certain operation. For example, certain function is blocking while it's connecting to WiFi or some services.
 
-The catch is ***your function is now part of an ISR (Interrupt Service Routine), and must be lean / mean, and follow certain rules.*** More to read on:
+The catch is **your function is now part of an ISR (Interrupt Service Routine), and must be lean / mean, and follow certain rules.** More to read on:
 
-[Howto Attach Interrupt](https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/)
+[**HOWTO Attach Interrupt**](https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/)
 
 ---
 
 #### Important Notes:
 
-1. Inside the attached function, ***delay() won’t work and the value returned by millis() will not increment.*** Serial data received while in the function may be lost. You should declare as ***volatile any variables that you modify within the attached function.***
+1. Inside the attached function, **delay() won’t work and the value returned by millis() will not increment.** Serial data received while in the function may be lost. You should declare as **volatile any variables that you modify within the attached function.**
 
 2. Typically global variables are used to pass data between an ISR and the main program. To make sure variables shared between an ISR and the main program are updated correctly, declare them as volatile.
 
@@ -59,8 +59,8 @@ The catch is ***your function is now part of an ISR (Interrupt Service Routine),
 ---
 
 ## Prerequisite
-1. [`Arduino IDE 1.8.12+` for Arduino](https://www.arduino.cc/en/Main/Software)
-2. [`ESP8266 core 2.7.3+` for Arduino](https://github.com/esp8266/Arduino#installing-with-boards-manager) for ESP8266 boards.
+1. [`Arduino IDE 1.8.13+`](https://www.arduino.cc/en/Main/Software)
+2. [`ESP8266 core 2.7.4+`](https://github.com/esp8266/Arduino#installing-with-boards-manager) for ESP8266 boards.
 
 ---
 ---
@@ -68,6 +68,7 @@ The catch is ***your function is now part of an ISR (Interrupt Service Routine),
 ## Installation
 
 ### Use Arduino Library Manager
+
 The best and easiest way is to use `Arduino Library Manager`. Search for `ESP8266TimerInterrupt`, then select / install the latest version.
 You can also use this link [![arduino-library-badge](https://www.ardu-badge.com/badge/ESP8266TimerInterrupt.svg?)](https://www.ardu-badge.com/ESP8266TimerInterrupt) for more detailed instructions.
 
@@ -81,25 +82,27 @@ Another way to install is to:
 4. Copy whole `ESP8266TimerInterrupt-master` folder to Arduino libraries' directory such as `~/Arduino/libraries/`.
 
 ### VS Code & PlatformIO:
+
 1. Install [VS Code](https://code.visualstudio.com/)
 2. Install [PlatformIO](https://platformio.org/platformio-ide)
 3. Install **ESP8266TimerInterrupt** library by using [Library Manager](https://docs.platformio.org/en/latest/librarymanager/). Search for ESP8266TimerInterrupt in [Platform.io Author's Libraries](https://platformio.org/lib/search?query=author:%22Khoi%20Hoang%22)
 4. Use included [platformio.ini](platformio/platformio.ini) file from examples to ensure that all dependent libraries will installed automatically. Please visit documentation for the other options and examples at [Project Configuration File](https://docs.platformio.org/page/projectconf.html)
 
 ---
+---
 
 ## More useful Information
 
-The ESP8266 timers are ***badly designed***, using only 23-bit counter along with maximum 256 prescaler. They're only better than UNO / Mega.
+The ESP8266 timers are **badly designed**, using only 23-bit counter along with maximum 256 prescaler. They're only better than UNO / Mega.
 The ESP8266 has two hardware timers, but timer0 has been used for WiFi and it's not advisable to use. Only timer1 is available.
 The timer1's 23-bit counter terribly can count only up to 8,388,607. So the timer1 maximum interval is very short.
-Using 256 prescaler, maximum timer1 interval is only ***26.843542 seconds !!!***
+Using 256 prescaler, maximum timer1 interval is only **26.843542 seconds !!!**
 
 The timer1 counters can be configured to support automatic reload.
 
 ## New from v1.0.2
 
-Now with these new ***`16 ISR-based timers`***, the maximum interval is ***practically unlimited*** (limited only by unsigned long miliseconds).
+Now with these new **`16 ISR-based timers`**, the maximum interval is **practically unlimited** (limited only by unsigned long miliseconds).
 
 The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers. Therefore, their executions are not blocked by bad-behaving functions / tasks.
 
@@ -206,9 +209,9 @@ void loop()
 ---
 
 
-The following is the sample terminal output when running example [ISR_Timer_Complex](examples/ISR_Timer_Complex) to demonstrate the accuracy of ISR Hardware Timer, ***especially when system is very busy***.  The ISR timer is ***programmed for 2s, is activated exactly after 2.000s !!!***
+The following is the sample terminal output when running example [ISR_Timer_Complex](examples/ISR_Timer_Complex) to demonstrate the accuracy of ISR Hardware Timer, **especially when system is very busy**.  The ISR timer is **programmed for 2s, is activated exactly after 2.000s !!!**
 
-While software timer, ***programmed for 2s, is activated after 4.258s !!!***
+While software timer, **programmed for 2s, is activated after 4.258s !!!**
 
 ```
 Starting ISR_Timer_Complex
@@ -276,6 +279,12 @@ doingSomething10s: Delta ms = 10000
 ---
 ---
 
+### Issues ###
+
+Submit issues to: [ESP8266TimerInterrupt issues](https://github.com/khoih-prog/ESP8266TimerInterrupt/issues)
+
+---
+
 ## TO DO
 
 1. Search for bug and improvement.
@@ -289,6 +298,8 @@ doingSomething10s: Delta ms = 10000
 
 ### Contributions and thanks
 
+---
+
 ## Contributing
 
 If you want to contribute to this project:
@@ -296,6 +307,12 @@ If you want to contribute to this project:
 - Ask for enhancements
 - Create issues and pull requests
 - Tell other people about this library
+
+---
+
+### License
+
+- The library is licensed under [MIT](https://github.com/khoih-prog/ESP8266TimerInterrupt/blob/master/LICENSE)
 
 ---
 
