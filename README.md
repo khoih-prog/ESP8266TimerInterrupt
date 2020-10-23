@@ -59,6 +59,7 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 ---
 
 ## Prerequisite
+
 1. [`Arduino IDE 1.8.13+`](https://www.arduino.cc/en/Main/Software)
 2. [`ESP8266 core 2.7.4+`](https://github.com/esp8266/Arduino#installing-with-boards-manager) for ESP8266 boards.
 
@@ -119,22 +120,22 @@ You'll see blynkTimer Software is blocked while system is connecting to WiFi / I
 
 ### HOWTO Use PWM analogWrite() with ESP8266 running Timer1 Interrupt
 
-Please have a look at [**ESP8266TimerInterrupt Issue 8: ESP8266Timer and PWM --> wdt reset*](https://github.com/khoih-prog/ESP8266TimerInterrupt/issues/8) to have more detailed description and solution of the issue.
+Please have a look at [ESP8266TimerInterrupt Issue 8: **ESP8266Timer and PWM --> wdt reset**](https://github.com/khoih-prog/ESP8266TimerInterrupt/issues/8) to have more detailed description and solution of the issue.
 
 #### 1. ESP8266 has only 2 hardware timers, named Timer0 and Timer1
 
 #### 2. ESP8266 hardware timers' functions
 
-- Timer0 has been used for WiFi and it's not advisable to use while using WiFi (if not, why select ESP8266 ??)
-- Timer1 is used by this [**ESP8266TimerInterrupt Library*](https://github.com/khoih-prog/ESP8266TimerInterrupt)
+- Timer0 has been used for WiFi and it's not advisable to use while using WiFi (if not using WiFi, why select ESP8266 ??)
+- Timer1 is used by this [**ESP8266TimerInterrupt Library**](https://github.com/khoih-prog/ESP8266TimerInterrupt)
 
 #### 3. How to use PWM analogWrite() functions while using this library
 
-  1. If possible, use software timer instead of [**ESP8266TimerInterrupt Hardware Timer1*](https://github.com/khoih-prog/ESP8266TimerInterrupt) 
-  2. If using [**ESP8266TimerInterrupt Hardware Timer1*](https://github.com/khoih-prog/ESP8266TimerInterrupt) is a must, you can 
+  1. If possible, use software timer instead of [**ESP8266TimerInterrupt Hardware Timer1**](https://github.com/khoih-prog/ESP8266TimerInterrupt) 
+  2. If using [**ESP8266TimerInterrupt Hardware Timer1**](https://github.com/khoih-prog/ESP8266TimerInterrupt) is a must, you can either
 
-    - Using external DAC such as AD5662, AD5667, AD5696.
-    - using software PWM such as mentioned in [**ESP8266 PWM REVISITED (AND REIMPLEMENTED)**](https://lurchi.wordpress.com/2016/06/29/esp8266-pwm-revisited-and-reimplemented/)
+    - use external DAC such as AD5662, AD5667, AD5696.
+    - use software PWM such as mentioned in [**ESP8266 PWM REVISITED (AND REIMPLEMENTED)**](https://lurchi.wordpress.com/2016/06/29/esp8266-pwm-revisited-and-reimplemented/)
 
 ---
 ---
@@ -310,7 +311,7 @@ Submit issues to: [ESP8266TimerInterrupt issues](https://github.com/khoih-prog/E
 ## TO DO
 
 1. Search for bug and improvement.
-2. Similar features for remaining Arduino boards suh as SAMD21, SAMD51, SAM-DUE, nRF52
+2. Similar features for remaining Arduino boards such as SAMD21, SAMD51, SAM-DUE, nRF52
 
 ## DONE
 
@@ -320,7 +321,7 @@ Submit issues to: [ESP8266TimerInterrupt issues](https://github.com/khoih-prog/E
 
 ### Contributions and thanks
 
-1. Thanks to [Holger Lembke](https://github.com/holgerlembke) to report [**ESP8266TimerInterrupt Issue 8: ESP8266Timer and PWM --> wdt reset*](https://github.com/khoih-prog/ESP8266TimerInterrupt/issues/8), leading to the [HOWTO Use PWM analogWrite() with ESP8266 running Timer1 Interrupt](https://github.com/khoih-prog/ESP8266TimerInterrupt#howto-use-pwm-analogwrite-with-esp8266-running-timer1-interrupt) notes.
+1. Thanks to [Holger Lembke](https://github.com/holgerlembke) to report [ESP8266TimerInterrupt Issue 8: **ESP8266Timer and PWM --> wdt reset**](https://github.com/khoih-prog/ESP8266TimerInterrupt/issues/8), leading to the [HOWTO Use PWM analogWrite() with ESP8266 running Timer1 Interrupt](https://github.com/khoih-prog/ESP8266TimerInterrupt#howto-use-pwm-analogwrite-with-esp8266-running-timer1-interrupt) notes.
 
 
 <table>
