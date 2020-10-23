@@ -117,6 +117,28 @@ You'll see blynkTimer Software is blocked while system is connecting to WiFi / I
 ---
 ---
 
+### HOWTO Use PWM analogWrite() with ESP8266 running Timer1 Interrupt
+
+Please have a look at [**ESP8266TimerInterrupt Issue 8: ESP8266Timer and PWM --> wdt reset*](https://github.com/khoih-prog/ESP8266TimerInterrupt/issues/8) to have more detailed description and solution of the issue.
+
+#### 1. ESP8266 has only 2 hardware timers, named Timer0 and Timer1
+
+#### 2. ESP8266 hardware timers' functions
+
+- Timer0 has been used for WiFi and it's not advisable to use while using WiFi (if not, why select ESP8266 ??)
+- Timer1 is used by this [**ESP8266TimerInterrupt Library*](https://github.com/khoih-prog/ESP8266TimerInterrupt)
+
+#### 3. How to use PWM analogWrite() functions while using this library
+
+  1. If possible, use software timer instead of [**ESP8266TimerInterrupt Hardware Timer1*](https://github.com/khoih-prog/ESP8266TimerInterrupt) 
+  2. If using [**ESP8266TimerInterrupt Hardware Timer1*](https://github.com/khoih-prog/ESP8266TimerInterrupt) is a must, you can 
+
+    - Using external DAC such as AD5662, AD5667, AD5696.
+    - using software PWM such as mentioned in [**ESP8266 PWM REVISITED (AND REIMPLEMENTED)**](https://lurchi.wordpress.com/2016/06/29/esp8266-pwm-revisited-and-reimplemented/)
+
+---
+---
+
 ### Examples: 
 
  1. [Argument_None](examples/Argument_None)
@@ -297,6 +319,16 @@ Submit issues to: [ESP8266TimerInterrupt issues](https://github.com/khoih-prog/E
 ---
 
 ### Contributions and thanks
+
+1. Thanks to [Holger Lembke](https://github.com/holgerlembke) to report [**ESP8266TimerInterrupt Issue 8: ESP8266Timer and PWM --> wdt reset*](https://github.com/khoih-prog/ESP8266TimerInterrupt/issues/8), leading to the [HOWTO Use PWM analogWrite() with ESP8266 running Timer1 Interrupt](https://github.com/khoih-prog/ESP8266TimerInterrupt#howto-use-pwm-analogwrite-with-esp8266-running-timer1-interrupt) notes.
+
+
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/holgerlembke"><img src="https://github.com/holgerlembke.png" width="100px;" alt="holgerlembke"/><br /><sub><b>Holger Lembke</b></sub></a><br /></td>
+  </tr> 
+</table>
+
 
 ---
 
