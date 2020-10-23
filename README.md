@@ -133,9 +133,8 @@ Please have a look at [ESP8266TimerInterrupt Issue 8: **ESP8266Timer and PWM -->
 
   1. If possible, use software timer instead of [**ESP8266TimerInterrupt Hardware Timer1**](https://github.com/khoih-prog/ESP8266TimerInterrupt) 
   2. If using [**ESP8266TimerInterrupt Hardware Timer1**](https://github.com/khoih-prog/ESP8266TimerInterrupt) is a must, you can either
-
-    - use external DAC such as AD5662, AD5667, AD5696.
-    - use software PWM such as mentioned in [**ESP8266 PWM REVISITED (AND REIMPLEMENTED)**](https://lurchi.wordpress.com/2016/06/29/esp8266-pwm-revisited-and-reimplemented/)
+  - use external DAC such as AD5662, AD5667, AD5696.
+  - use software PWM such as mentioned in [ESP8266 PWM REVISITED (AND REIMPLEMENTED)](https://lurchi.wordpress.com/2016/06/29/esp8266-pwm-revisited-and-reimplemented/)
 
 ---
 ---
