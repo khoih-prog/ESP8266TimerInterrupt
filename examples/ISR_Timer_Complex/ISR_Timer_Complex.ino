@@ -5,7 +5,6 @@
 
    Built by Khoi Hoang https://github.com/khoih-prog/ESP8266TimerInterrupt
    Licensed under MIT license
-   Version: 1.0.3
 
    The ESP8266 timers are badly designed, using only 23-bit counter along with maximum 256 prescaler. They're only better than UNO / Mega.
    The ESP8266 has two hardware timers, but timer0 has been used for WiFi and it's not advisable to use. Only timer1 is available.
@@ -23,13 +22,16 @@
 
    Based on BlynkTimer.h
    Author: Volodymyr Shymanskyy
-
+  
+   Version: 1.1.0
+   
    Version Modified By   Date      Comments
    ------- -----------  ---------- -----------
     1.0.0   K Hoang      23/11/2019 Initial coding
     1.0.1   K Hoang      25/11/2019 New release fixing compiler error
     1.0.2   K.Hoang      26/11/2019 Permit up to 16 super-long-time, super-accurate ISR-based timers to avoid being blocked
     1.0.3   K.Hoang      17/05/2020 Restructure code. Fix example. Enhance README.
+    1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
 *****************************************************************************************************************************/
 /* Notes:
    Special design is necessary to share data between interrupt code and the rest of your program.
@@ -53,60 +55,47 @@
 */
 
 #if !defined(ESP8266)
-#error This code is designed to run on ESP8266 and ESP8266-based boards! Please check your Tools->Board setting.
+  #error This code is designed to run on ESP8266 and ESP8266-based boards! Please check your Tools->Board setting.
 #endif
-
-//These define's must be placed at the beginning before #include "ESP8266TimerInterrupt.h"
-#define TIMER_INTERRUPT_DEBUG      1
 
 #define BLYNK_PRINT Serial
 //#define BLYNK_DEBUG true
 
 #include <ESP8266WiFi.h>
 
-//#define USE_BLYNK_WM   true
-#define USE_BLYNK_WM   false
-
 #define USE_SSL     false
 
-#if USE_BLYNK_WM
-  #if USE_SSL
-    #include <BlynkSimpleEsp8266_SSL_WM.h>        //https://github.com/khoih-prog/Blynk_WM
-  #else
-    #include <BlynkSimpleEsp8266_WM.h>            //https://github.com/khoih-prog/Blynk_WM
-  #endif
+#if USE_SSL
+  #include <BlynkSimpleEsp8266_SSL.h>
+  #define BLYNK_HARDWARE_PORT     9443
 #else
-  #if USE_SSL
-    #include <BlynkSimpleEsp8266_SSL.h>
-    #define BLYNK_HARDWARE_PORT     9443
-  #else
-    #include <BlynkSimpleEsp8266.h>
-    #define BLYNK_HARDWARE_PORT     8080   
-  #endif
+  #include <BlynkSimpleEsp8266.h>
+  #define BLYNK_HARDWARE_PORT     8080
 #endif
 
-#if !USE_BLYNK_WM
-  #define USE_LOCAL_SERVER    true
-  
-  // If local server
-  #if USE_LOCAL_SERVER
-    char blynk_server[]   = "yourname.duckdns.org";
-    //char blynk_server[]   = "192.168.2.110";
-  #else
-    char blynk_server[]   = "";
-  #endif
+#define USE_LOCAL_SERVER    true
 
-char auth[]     = "***";
-char ssid[]     = "***";
-char pass[]     = "***";
-
+// If local server
+#if USE_LOCAL_SERVER
+  char blynk_server[]   = "account.duckdns.org";
+  //char blynk_server[]   = "192.168.2.110";
+#else
+  char blynk_server[]   = "";
 #endif
+
+char auth[]     = "****";
+char ssid[]     = "****";
+char pass[]     = "****";
+
+// These define's must be placed at the beginning before #include "ESP8266TimerInterrupt.h"
+// Don't define TIMER_INTERRUPT_DEBUG > 2. Only for special ISR debugging only. Can hang the system.
+#define TIMER_INTERRUPT_DEBUG      1
 
 #include "ESP8266TimerInterrupt.h"
 #include "ESP8266_ISR_Timer.h"
 
 #ifndef LED_BUILTIN
-#define LED_BUILTIN       2         // Pin D4 mapped to pin GPIO2/TXD1 of ESP8266, NodeMCU and WeMoS, control on-board LED
+  #define LED_BUILTIN       2         // Pin D4 mapped to pin GPIO2/TXD1 of ESP8266, NodeMCU and WeMoS, control on-board LED
 #endif
 
 #define HW_TIMER_INTERVAL_MS        50
@@ -157,6 +146,7 @@ void ICACHE_RAM_ATTR TimerHandler(void)
 void ICACHE_RAM_ATTR doingSomething2s()
 {
   static unsigned long previousMillis = lastMillis;
+  
   Serial.println("doingSomething2s: Delta ms = " + String(millis() - previousMillis));
   previousMillis = millis();
 }
@@ -164,6 +154,7 @@ void ICACHE_RAM_ATTR doingSomething2s()
 void ICACHE_RAM_ATTR doingSomething5s()
 {
   static unsigned long previousMillis = lastMillis;
+  
   Serial.println("doingSomething5s: Delta ms = " + String(millis() - previousMillis));
   previousMillis = millis();
 }
@@ -171,6 +162,7 @@ void ICACHE_RAM_ATTR doingSomething5s()
 void ICACHE_RAM_ATTR doingSomething10s()
 {
   static unsigned long previousMillis = lastMillis;
+  
   Serial.println("doingSomething10s: Delta ms = " + String(millis() - previousMillis));
   previousMillis = millis();
 }
@@ -178,6 +170,7 @@ void ICACHE_RAM_ATTR doingSomething10s()
 void ICACHE_RAM_ATTR doingSomething50s()
 {
   static unsigned long previousMillis = lastMillis;
+  
   Serial.println("doingSomething50s: Delta ms = " + String(millis() - previousMillis));
   previousMillis = millis();
 }
@@ -196,7 +189,10 @@ void setup()
   Serial.begin(115200);
   while (!Serial);
   
-  Serial.println("\nStarting ISR_Timer_Complex");
+  delay(200);
+
+  Serial.println("\nStarting ISR_Timer_Complex on " + String(ARDUINO_BOARD));
+  Serial.println("CPU Frequency = " + String(F_CPU / 1000000) + " MHz");
   
   // Interval in microsecs
   if (ITimer.attachInterruptInterval(HW_TIMER_INTERVAL_MS * 1000, TimerHandler))
@@ -216,30 +212,25 @@ void setup()
   // You need this timer for non-critical tasks. Avoid abusing ISR if not absolutely necessary.
   blynkTimer.setInterval(BLYNK_TIMER_MS, blynkDoingSomething2s);  
 
-
-  #if USE_BLYNK_WM
-    Blynk.begin();
-  #else
-    unsigned long startWiFi = millis();
+  unsigned long startWiFi = millis();
+  
+  WiFi.begin(ssid, pass);
+  
+  do
+  {
+    delay(200);
     
-    WiFi.begin(ssid, pass);
-    
-    do
-    {
-      delay(200);
-      if ( (WiFi.status() == WL_CONNECTED) || (millis() > startWiFi + WIFI_TIMEOUT) )
-        break;
-    } while (WiFi.status() != WL_CONNECTED);
-    
-    Blynk.config(auth, blynk_server, BLYNK_HARDWARE_PORT);
-    Blynk.connect();
+    if ( (WiFi.status() == WL_CONNECTED) || (millis() > startWiFi + WIFI_TIMEOUT) )
+      break;
+  } while (WiFi.status() != WL_CONNECTED);
+  
+  Blynk.config(auth, blynk_server, BLYNK_HARDWARE_PORT);
+  Blynk.connect();
 
-    if (Blynk.connected())
-      Serial.println("Blynk connected");
-    else
-      Serial.println("Blynk not connected yet");  
-  #endif
-
+  if (Blynk.connected())
+    Serial.println("Blynk connected");
+  else
+    Serial.println("Blynk not connected yet");  
 }
 
 #define BLOCKING_TIME_MS      3000L

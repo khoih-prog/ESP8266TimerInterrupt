@@ -5,7 +5,6 @@
 
    Built by Khoi Hoang https://github.com/khoih-prog/ESP8266TimerInterrupt
    Licensed under MIT license
-   Version: 1.0.3
 
    The ESP8266 timers are badly designed, using only 23-bit counter along with maximum 256 prescaler. They're only better than UNO / Mega.
    The ESP8266 has two hardware timers, but timer0 has been used for WiFi and it's not advisable to use. Only timer1 is available.
@@ -23,13 +22,16 @@
 
    Based on BlynkTimer.h
    Author: Volodymyr Shymanskyy
-
+  
+   Version: 1.1.0
+   
    Version Modified By   Date      Comments
    ------- -----------  ---------- -----------
     1.0.0   K Hoang      23/11/2019 Initial coding
     1.0.1   K Hoang      25/11/2019 New release fixing compiler error
     1.0.2   K.Hoang      26/11/2019 Permit up to 16 super-long-time, super-accurate ISR-based timers to avoid being blocked
     1.0.3   K.Hoang      17/05/2020 Restructure code. Fix example. Enhance README.
+    1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
 *****************************************************************************************************************************/
 
 /* Notes:
@@ -53,29 +55,29 @@
    then use timer to count the time between active state
 */
 #if !defined(ESP8266)
-#error This code is designed to run on ESP8266 and ESP8266-based boards! Please check your Tools->Board setting.
+  #error This code is designed to run on ESP8266 and ESP8266-based boards! Please check your Tools->Board setting.
 #endif
 
-//These define's must be placed at the beginning before #include "ESP8266TimerInterrupt.h"
+// These define's must be placed at the beginning before #include "ESP8266TimerInterrupt.h"
 // Don't define TIMER_INTERRUPT_DEBUG > 2. Only for special ISR debugging only. Can hang the system.
-
 #define TIMER_INTERRUPT_DEBUG      1
 
 #include "ESP8266TimerInterrupt.h"
 
-#define PIN_D1            5         // Pin D1 mapped to pin GPIO5 of ESP8266
+#define PIN_D1                    5         // Pin D1 mapped to pin GPIO5 of ESP8266
 
 unsigned int SWPin = PIN_D1;
 
-#define TIMER_INTERVAL_MS        1
+#define TIMER_INTERVAL_MS         1
 #define DEBOUNCING_INTERVAL_MS    80
 
-#define LOCAL_DEBUG      1
+#define LOCAL_DEBUG               1
 
 // Init ESP8266 timer 0
 ESP8266Timer ITimer;
 
 volatile unsigned long rotationTime = 0;
+
 float RPM       = 0.00;
 float avgRPM    = 0.00;
 
@@ -125,8 +127,11 @@ void setup()
 {
   Serial.begin(115200);
   while (!Serial);
-  
-  Serial.println("\nStarting RPM_Measure");
+
+  delay(200);
+
+  Serial.println("\nStarting RPM_Measure on " + String(ARDUINO_BOARD));
+  Serial.println("CPU Frequency = " + String(F_CPU / 1000000) + " MHz");
 
   // Interval in microsecs
   if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 1000, TimerHandler))

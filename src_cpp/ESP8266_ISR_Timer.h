@@ -185,5 +185,4 @@ class ESP8266_ISR_Timer
     volatile int numTimers;
 };
 
-#include "ESP8266_ISR_Timer-Impl.h"
 

@@ -5,7 +5,6 @@
 
    Built by Khoi Hoang https://github.com/khoih-prog/ESP8266TimerInterrupt
    Licensed under MIT license
-   Version: 1.0.3
 
    The ESP8266 timers are badly designed, using only 23-bit counter along with maximum 256 prescaler. They're only better than UNO / Mega.
    The ESP8266 has two hardware timers, but timer0 has been used for WiFi and it's not advisable to use. Only timer1 is available.
@@ -23,13 +22,16 @@
 
    Based on BlynkTimer.h
    Author: Volodymyr Shymanskyy
-
+  
+   Version: 1.1.0
+   
    Version Modified By   Date      Comments
    ------- -----------  ---------- -----------
     1.0.0   K Hoang      23/11/2019 Initial coding
     1.0.1   K Hoang      25/11/2019 New release fixing compiler error
     1.0.2   K.Hoang      26/11/2019 Permit up to 16 super-long-time, super-accurate ISR-based timers to avoid being blocked
     1.0.3   K.Hoang      17/05/2020 Restructure code. Fix example. Enhance README.
+    1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
 *****************************************************************************************************************************/
 /* Notes:
    Special design is necessary to share data between interrupt code and the rest of your program.
@@ -64,63 +66,51 @@
 */
 
 #if !defined(ESP8266)
-#error This code is designed to run on ESP8266 and ESP8266-based boards! Please check your Tools->Board setting.
+  #error This code is designed to run on ESP8266 and ESP8266-based boards! Please check your Tools->Board setting.
 #endif
 
 #define BLYNK_PRINT Serial
 
 #ifdef BLYNK_DEBUG
-#undef BLYNK_DEBUG
-//#define BLYNK_DEBUG true
+  #undef BLYNK_DEBUG
+  //#define BLYNK_DEBUG true
 #endif
-
-#define TIMER_INTERRUPT_DEBUG      1
 
 #include <ESP8266WiFi.h>
 
-//#define USE_BLYNK_WM   true
-#define USE_BLYNK_WM   false
-
 #define USE_SSL     false
 
-#if USE_BLYNK_WM
 #if USE_SSL
-#include <BlynkSimpleEsp8266_SSL_WM.h>        //https://github.com/khoih-prog/Blynk_WM
+  #include <BlynkSimpleEsp8266_SSL.h>
+  #define BLYNK_HARDWARE_PORT     9443
 #else
-#include <BlynkSimpleEsp8266_WM.h>            //https://github.com/khoih-prog/Blynk_WM
+  #include <BlynkSimpleEsp8266.h>
+  #define BLYNK_HARDWARE_PORT     8080
 #endif
+
+#define USE_LOCAL_SERVER    true
+
+// If local server
+#if USE_LOCAL_SERVER
+  char blynk_server[]   = "account.duckdns.org";
+  //char blynk_server[]   = "192.168.2.110";
 #else
-#if USE_SSL
-#include <BlynkSimpleEsp8266_SSL.h>
-#define BLYNK_HARDWARE_PORT     9443
-#else
-#include <BlynkSimpleEsp8266.h>
-#define BLYNK_HARDWARE_PORT     8080
+  char blynk_server[]   = "";
 #endif
-#endif
+
+char auth[]     = "****";
+char ssid[]     = "****";
+char pass[]     = "****";
+
+// These define's must be placed at the beginning before #include "ESP8266TimerInterrupt.h"
+// Don't define TIMER_INTERRUPT_DEBUG > 2. Only for special ISR debugging only. Can hang the system.
+#define TIMER_INTERRUPT_DEBUG       1
 
 #include "ESP8266TimerInterrupt.h"
 
 // Init ESP8266 timer
 ESP8266Timer ITimer;
-#define TIMER_INTERVAL_MS         100
-
-#if !USE_BLYNK_WM
-#define USE_LOCAL_SERVER    true
-
-// If local server
-#if USE_LOCAL_SERVER
-char blynk_server[]   = "";
-//char blynk_server[]   = "192.168.2.110";
-#else
-char blynk_server[]   = "";
-#endif
-
-char auth[]     = "";
-char ssid[]     = "";
-char pass[]     = "";
-
-#endif
+#define TIMER_INTERVAL_MS           100
 
 #define DEBOUNCE_TIME               25
 #define LONG_BUTTON_PRESS_TIME_MS   10
@@ -131,10 +121,10 @@ char pass[]     = "";
 // It's suggested to use #define's to centralize the pins' assignment in one place
 // so that if you need to change, just one place to do, avoiding mistakes
 
-#define VPIN0  V1
-#define VPIN1  V2
-#define VPIN2  V3
-#define VPIN3  V4
+#define VPIN0             V1
+#define VPIN1             V2
+#define VPIN2             V3
+#define VPIN3             V4
 
 #define TAC_SW0_PIN       D3
 #define RELAY_0_PIN       D1
@@ -369,22 +359,23 @@ void heartBeatPrint(void)
 {
   static int num = 1;
 
-#define NUMBER_B_PER_LINE               80
-#define NUMBER_B_PER_SPACE              10
-#define NUMBER_INTERVALS_PER_PRINT      100
+  if (Blynk.connected())
+  {
+    Serial.print("B");
+  }
+  else
+  {
+    Serial.print("F");
+  }
 
-  if (num == NUMBER_B_PER_LINE * NUMBER_INTERVALS_PER_PRINT)
+  if (num == 40)
   {
     Serial.println();
     num = 1;
   }
-  else if (num % (NUMBER_B_PER_SPACE * NUMBER_INTERVALS_PER_PRINT) == 0)
+  else if (num++ % 10 == 0)
   {
     Serial.print(" ");
-  }
-  else if (num++ % NUMBER_INTERVALS_PER_PRINT == 0)
-  {
-    Serial.print("B");
   }
 }
 
@@ -477,7 +468,10 @@ void setup()
   Serial.begin(115200);
   while (!Serial);
   
-  Serial.println("\nStarting ISR_Timer_4_Switches");
+  delay(200);
+
+  Serial.println("\nStarting ISR_Timer_4_Switches on " + String(ARDUINO_BOARD));
+  Serial.println("CPU Frequency = " + String(F_CPU / 1000000) + " MHz");
 
   for (int index = 0; index < NUMBER_OF_LAMPS; index++)
   {
@@ -498,9 +492,6 @@ void setup()
   else
     Serial.println("Can't set ITimer. Select another freq. or interval");
 
-#if USE_BLYNK_WM
-  Blynk.begin();
-#else
   unsigned long startWiFi = millis();
 
   WiFi.begin(ssid, pass);
@@ -519,7 +510,6 @@ void setup()
     Serial.println("Blynk connected");
   else
     Serial.println("Blynk not connected yet");
-#endif
 
   // Use only one to check all 4
   Timer.setInterval(buttonInterval, checkButton);

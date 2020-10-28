@@ -1,5 +1,5 @@
 /****************************************************************************************************************************
-   ESP8266_ISR_Timer-Impl.h
+   ESP8266_ISR_Timer.cpp
    For ESP8266 boards
    Written by Khoi Hoang
 
@@ -33,8 +33,6 @@
     1.0.3   K.Hoang      17/05/2020 Restructure code. Fix example. Enhance README.
     1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
 *****************************************************************************************************************************/
-
-#pragma once
 
 #if !defined(ESP8266)
   #error This code is designed to run on ESP8266 and ESP8266-based boards! Please check your Tools->Board setting.

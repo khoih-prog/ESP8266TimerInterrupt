@@ -5,7 +5,6 @@
 
    Built by Khoi Hoang https://github.com/khoih-prog/ESP8266TimerInterrupt
    Licensed under MIT license
-   Version: 1.0.3
 
    The ESP8266 timers are badly designed, using only 23-bit counter along with maximum 256 prescaler. They're only better than UNO / Mega.
    The ESP8266 has two hardware timers, but timer0 has been used for WiFi and it's not advisable to use. Only timer1 is available.
@@ -23,13 +22,16 @@
 
    Based on BlynkTimer.h
    Author: Volodymyr Shymanskyy
-
+  
+   Version: 1.1.0
+   
    Version Modified By   Date      Comments
    ------- -----------  ---------- -----------
     1.0.0   K Hoang      23/11/2019 Initial coding
     1.0.1   K Hoang      25/11/2019 New release fixing compiler error
     1.0.2   K.Hoang      26/11/2019 Permit up to 16 super-long-time, super-accurate ISR-based timers to avoid being blocked
     1.0.3   K.Hoang      17/05/2020 Restructure code. Fix example. Enhance README.
+    1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
 *****************************************************************************************************************************/
 /* Notes:
    Special design is necessary to share data between interrupt code and the rest of your program.
@@ -53,54 +55,41 @@
 */
 
 #if !defined(ESP8266)
-#error This code is designed to run on ESP8266 and ESP8266-based boards! Please check your Tools->Board setting.
+  #error This code is designed to run on ESP8266 and ESP8266-based boards! Please check your Tools->Board setting.
 #endif
-
-//These define's must be placed at the beginning before #include "ESP8266TimerInterrupt.h"
-#define TIMER_INTERRUPT_DEBUG      1
 
 #define BLYNK_PRINT Serial
 //#define BLYNK_DEBUG true
 
 #include <ESP8266WiFi.h>
 
-//#define USE_BLYNK_WM   true
-#define USE_BLYNK_WM   false
-
 #define USE_SSL     false
 
-#if USE_BLYNK_WM
 #if USE_SSL
-#include <BlynkSimpleEsp8266_SSL_WM.h>        //https://github.com/khoih-prog/Blynk_WM
+  #include <BlynkSimpleEsp8266_SSL.h>
+  #define BLYNK_HARDWARE_PORT     9443
 #else
-#include <BlynkSimpleEsp8266_WM.h>            //https://github.com/khoih-prog/Blynk_WM
-#endif
-#else
-#if USE_SSL
-#include <BlynkSimpleEsp8266_SSL.h>
-#define BLYNK_HARDWARE_PORT     9443
-#else
-#include <BlynkSimpleEsp8266.h>
-#define BLYNK_HARDWARE_PORT     8080
-#endif
+  #include <BlynkSimpleEsp8266.h>
+  #define BLYNK_HARDWARE_PORT     8080
 #endif
 
-#if !USE_BLYNK_WM
 #define USE_LOCAL_SERVER    true
 
 // If local server
 #if USE_LOCAL_SERVER
-char blynk_server[]   = "yourname.duckdns.org";
-//char blynk_server[]   = "192.168.2.110";
+  char blynk_server[]   = "account.duckdns.org";
+  //char blynk_server[]   = "192.168.2.110";
 #else
-char blynk_server[]   = "";
+  char blynk_server[]   = "";
 #endif
 
-char auth[]     = "***";
-char ssid[]     = "***";
-char pass[]     = "***";
+char auth[]     = "****";
+char ssid[]     = "****";
+char pass[]     = "****";
 
-#endif
+// These define's must be placed at the beginning before #include "ESP8266TimerInterrupt.h"
+// Don't define TIMER_INTERRUPT_DEBUG > 2. Only for special ISR debugging only. Can hang the system.
+#define TIMER_INTERRUPT_DEBUG       1
 
 #define DEBOUNCE_TIME               25
 #define LONG_BUTTON_PRESS_TIME_MS   100
@@ -158,6 +147,7 @@ void ICACHE_RAM_ATTR Rising()
   unsigned long TimeDiff;
 
   TimeDiff = currentTime - lastDebounceTime;
+  
   if ( digitalRead(BUTTON_PIN) && (TimeDiff > DEBOUNCE_TIME) )
   {
     buttonPressed = false;
@@ -184,8 +174,16 @@ void heartBeatPrint(void)
 {
   static int num = 1;
 
-  Serial.print("B");
-  if (num == 80)
+  if (Blynk.connected())
+  {
+    Serial.print("B");
+  }
+  else
+  {
+    Serial.print("F");
+  }
+
+  if (num == 40)
   {
     Serial.println();
     num = 1;
@@ -251,15 +249,15 @@ void setup()
   Serial.begin(115200);
   while (!Serial);
 
-  Serial.println("\nStarting ISR_Switch");
+  delay(200);
+
+  Serial.println("\nStarting ISR_Switch on " + String(ARDUINO_BOARD));
+  Serial.println("CPU Frequency = " + String(F_CPU / 1000000) + " MHz");
 
   LampState = false;
 
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), Falling, FALLING);
 
-#if USE_BLYNK_WM
-  Blynk.begin();
-#else
   unsigned long startWiFi = millis();
 
   WiFi.begin(ssid, pass);
@@ -278,7 +276,6 @@ void setup()
     Serial.println("Blynk connected");
   else
     Serial.println("Blynk not connected yet");
-#endif
 
   Timer.setInterval(buttonInterval, checkButton);
 }
