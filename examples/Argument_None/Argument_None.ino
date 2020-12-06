@@ -23,7 +23,7 @@
    Based on BlynkTimer.h
    Author: Volodymyr Shymanskyy
   
-   Version: 1.1.0
+   Version: 1.1.1
    
    Version Modified By   Date      Comments
    ------- -----------  ---------- -----------
@@ -32,6 +32,7 @@
     1.0.2   K.Hoang      26/11/2019 Permit up to 16 super-long-time, super-accurate ISR-based timers to avoid being blocked
     1.0.3   K.Hoang      17/05/2020 Restructure code. Fix example. Enhance README.
     1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
+    1.1.1   K.Hoang      06/12/2020 Add Version String and Change_Interval example to show how to change TimerInterval
 *****************************************************************************************************************************/
 
 /* Notes:
@@ -55,7 +56,7 @@
 #include "ESP8266TimerInterrupt.h"
 
 #ifndef LED_BUILTIN
-#define LED_BUILTIN       2         // Pin D4 mapped to pin GPIO2/TXD1 of ESP8266, NodeMCU and WeMoS, control on-board LED
+  #define LED_BUILTIN       2         // Pin D4 mapped to pin GPIO2/TXD1 of ESP8266, NodeMCU and WeMoS, control on-board LED
 #endif
 
 volatile uint32_t lastMillis = 0;
@@ -83,7 +84,7 @@ void ICACHE_RAM_ATTR TimerHandler(void)
 
 #define TIMER_INTERVAL_MS        1000
 
-// Init ESP32 timer 0
+// Init ESP8266Timer
 ESP8266Timer ITimer;
 
 
@@ -95,6 +96,7 @@ void setup()
   delay(200);
 
   Serial.println("\nStarting Argument_None on " + String(ARDUINO_BOARD));
+  Serial.println(ESP8266_TIMER_INTERRUPT_VERSION);
   Serial.println("CPU Frequency = " + String(F_CPU / 1000000) + " MHz");
 
   // Interval in microsecs

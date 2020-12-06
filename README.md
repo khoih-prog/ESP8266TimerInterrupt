@@ -42,6 +42,11 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 ---
 ---
 
+### Releases v1.1.1
+
+1. Add [**Change_Interval**](examples/Change_Interval) example to show how to change TimerInterval on-the-fly
+2. Add Version String
+
 ### Releases v1.1.0
 
 1. Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
@@ -64,7 +69,7 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 ---
 ---
 
-## Prerequisite
+## Prerequisites
 
 1. [`Arduino IDE 1.8.13+`](https://www.arduino.cc/en/Main/Software)
 2. [`ESP8266 core 2.7.4+`](https://github.com/esp8266/Arduino#installing-with-boards-manager) for ESP8266 boards.
@@ -92,7 +97,7 @@ Another way to install is to:
 
 1. Install [VS Code](https://code.visualstudio.com/)
 2. Install [PlatformIO](https://platformio.org/platformio-ide)
-3. Install [**ESP8266TimerInterrupt** library](https://platformio.org/lib/show/6901/ESP8266TimerInterrupt) by using [Library Manager](https://platformio.org/lib/show/6901/ESP8266TimerInterrupt/installation). Search for **ESP8266TimerInterrupt** in [Platform.io Author's Libraries](https://platformio.org/lib/search?query=author:%22Khoi%20Hoang%22)
+3. Install [**ESP8266TimerInterrupt** library](https://platformio.org/lib/show/11385/ESP8266TimerInterrupt) or [**ESP8266TimerInterrupt** library](https://platformio.org/lib/show/6901/ESP8266TimerInterrupt) by using [Library Manager](https://platformio.org/lib/show/11385/ESP8266TimerInterrupt/installation). Search for **ESP8266TimerInterrupt** in [Platform.io Author's Libraries](https://platformio.org/lib/search?query=author:%22Khoi%20Hoang%22)
 4. Use included [platformio.ini](platformio/platformio.ini) file from examples to ensure that all dependent libraries will installed automatically. Please visit documentation for the other options and examples at [Project Configuration File](https://docs.platformio.org/page/projectconf.html)
 
 ---
@@ -188,6 +193,7 @@ Please have a look at [ESP8266TimerInterrupt Issue 8: **ESP8266Timer and PWM -->
  8. [RPM_Measure](examples/RPM_Measure)
  9. [SwitchDebounce](examples/SwitchDebounce)
 10. [TimerInterruptTest](examples/TimerInterruptTest)
+11. [**Change_Interval**](examples/Change_Interval). New.
 
 ---
 ---
@@ -333,6 +339,7 @@ void setup()
   delay(200);
 
   Serial.println("\nStarting ISR_Timer_Complex on " + String(ARDUINO_BOARD));
+  Serial.println(ESP8266_TIMER_INTERRUPT_VERSION);
   Serial.println("CPU Frequency = " + String(F_CPU / 1000000) + " MHz");
   
   // Interval in microsecs
@@ -405,6 +412,7 @@ While software timer, **programmed for 2s, is activated after 4.258s !!!**
 
 ```
 Starting ISR_Timer_Complex on ESP8266_NODEMCU
+ESP8266TimerInterrupt v1.1.1
 CPU Frequency = 160 MHz
 ESP8266TimerInterrupt: _fre = 312500.00, _count = 15625
 Starting  ITimer OK, millis() = 64
@@ -450,6 +458,7 @@ doingSomething10s: Delta ms = 10000
 
 ```
 Starting TimerInterruptTest on ESP8266_NODEMCU
+ESP8266TimerInterrupt v1.1.1
 CPU Frequency = 160 MHz
 ESP8266TimerInterrupt: _fre = 312500.00, _count = 312500
 Starting  ITimer OK, millis() = 262
@@ -474,7 +483,49 @@ Delta ms = 1000
 ```
 
 ---
+
+3. The following is the sample terminal output when running example [Change_Interval](examples/Change_Interval) to demonstrate how to change Timer Interval on-the-fly
+
+```
+Starting Change_Interval on ESP8266_NODEMCU
+ESP8266TimerInterrupt v1.1.1
+CPU Frequency = 160 MHz
+Starting  ITimer OK, millis() = 162
+Time = 10001, TimerCount = 19
+Time = 20002, TimerCount = 39
+Changing Interval, Timer = 1000
+Time = 30003, TimerCount = 49
+Time = 40004, TimerCount = 59
+Changing Interval, Timer = 500
+Time = 50005, TimerCount = 79
+Time = 60006, TimerCount = 99
+Changing Interval, Timer = 1000
+Time = 70007, TimerCount = 109
+Time = 80008, TimerCount = 119
+Changing Interval, Timer = 500
+Time = 90009, TimerCount = 139
+Time = 100010, TimerCount = 159
+Changing Interval, Timer = 1000
+Time = 110011, TimerCount = 169
+Time = 120012, TimerCount = 179
+Changing Interval, Timer = 500
+Time = 130013, TimerCount = 199
+Time = 140014, TimerCount = 219
+Changing Interval, Timer = 1000
+Time = 150015, TimerCount = 229
+Time = 160016, TimerCount = 239
+Changing Interval, Timer = 500
+Time = 170017, TimerCount = 259
+Time = 180018, TimerCount = 279
+```
+
 ---
+---
+
+### Releases v1.1.1
+
+1. Add [**Change_Interval**](examples/Change_Interval) example to show how to change TimerInterval on-the-fly
+2. Add Version String
 
 ### Releases v1.1.0
 

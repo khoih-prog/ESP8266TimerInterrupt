@@ -23,7 +23,7 @@
    Based on BlynkTimer.h
    Author: Volodymyr Shymanskyy
   
-   Version: 1.1.0
+   Version: 1.1.1
    
    Version Modified By   Date      Comments
    ------- -----------  ---------- -----------
@@ -32,6 +32,7 @@
     1.0.2   K.Hoang      26/11/2019 Permit up to 16 super-long-time, super-accurate ISR-based timers to avoid being blocked
     1.0.3   K.Hoang      17/05/2020 Restructure code. Fix example. Enhance README.
     1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
+    1.1.1   K.Hoang      06/12/2020 Add Version String and Change_Interval example to show how to change TimerInterval
 *****************************************************************************************************************************/
 
 #if !defined(ESP8266)
