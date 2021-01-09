@@ -1,52 +1,59 @@
 /****************************************************************************************************************************
-   ESP8266TimerInterrupt.h
-   For ESP8266 boards
-   Written by Khoi Hoang
+  ESP8266TimerInterrupt.h
+  For ESP8266 boards
+  Written by Khoi Hoang
 
-   Built by Khoi Hoang https://github.com/khoih-prog/ESP8266TimerInterrupt
-   Licensed under MIT license
+  Built by Khoi Hoang https://github.com/khoih-prog/ESP8266TimerInterrupt
+  Licensed under MIT license
 
-   The ESP8266 timers are badly designed, using only 23-bit counter along with maximum 256 prescaler. They're only better than UNO / Mega.
-   The ESP8266 has two hardware timers, but timer0 has been used for WiFi and it's not advisable to use. Only timer1 is available.
-   The timer1's 23-bit counter terribly can count only up to 8,388,607. So the timer1 maximum interval is very short.
-   Using 256 prescaler, maximum timer1 interval is only 26.843542 seconds !!!
+  The ESP8266 timers are badly designed, using only 23-bit counter along with maximum 256 prescaler. They're only better than UNO / Mega.
+  The ESP8266 has two hardware timers, but timer0 has been used for WiFi and it's not advisable to use. Only timer1 is available.
+  The timer1's 23-bit counter terribly can count only up to 8,388,607. So the timer1 maximum interval is very short.
+  Using 256 prescaler, maximum timer1 interval is only 26.843542 seconds !!!
 
-   Now with these new 16 ISR-based timers, the maximum interval is practically unlimited (limited only by unsigned long miliseconds)
-   The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
-   Therefore, their executions are not blocked by bad-behaving functions / tasks.
-   This important feature is absolutely necessary for mission-critical tasks.
+  Now with these new 16 ISR-based timers, the maximum interval is practically unlimited (limited only by unsigned long miliseconds)
+  The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
+  Therefore, their executions are not blocked by bad-behaving functions / tasks.
+  This important feature is absolutely necessary for mission-critical tasks.
 
-   Based on SimpleTimer - A timer library for Arduino.
-   Author: mromani@ottotecnica.com
-   Copyright (c) 2010 OTTOTECNICA Italy
+  Based on SimpleTimer - A timer library for Arduino.
+  Author: mromani@ottotecnica.com
+  Copyright (c) 2010 OTTOTECNICA Italy
 
-   Based on BlynkTimer.h
-   Author: Volodymyr Shymanskyy
-  
-   Version: 1.1.1
-   
-   Version Modified By   Date      Comments
-   ------- -----------  ---------- -----------
-    1.0.0   K Hoang      23/11/2019 Initial coding
-    1.0.1   K Hoang      25/11/2019 New release fixing compiler error
-    1.0.2   K.Hoang      26/11/2019 Permit up to 16 super-long-time, super-accurate ISR-based timers to avoid being blocked
-    1.0.3   K.Hoang      17/05/2020 Restructure code. Fix example. Enhance README.
-    1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
-    1.1.1   K.Hoang      06/12/2020 Add Version String and Change_Interval example to show how to change TimerInterval
+  Based on BlynkTimer.h
+  Author: Volodymyr Shymanskyy
+
+  Version: 1.2.0
+
+  Version Modified By   Date      Comments
+  ------- -----------  ---------- -----------
+  1.0.0   K Hoang      23/11/2019 Initial coding
+  1.0.1   K Hoang      25/11/2019 New release fixing compiler error
+  1.0.2   K.Hoang      26/11/2019 Permit up to 16 super-long-time, super-accurate ISR-based timers to avoid being blocked
+  1.0.3   K.Hoang      17/05/2020 Restructure code. Fix example. Enhance README.
+  1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
+  1.1.1   K.Hoang      06/12/2020 Add Version String and Change_Interval example to show how to change TimerInterval
+  1.2.0   K.Hoang      08/01/2021 Add better debug feature. Optimize code and examples to reduce RAM usage
 *****************************************************************************************************************************/
 
 #pragma once
+
+#ifndef ESP8266TIMERINTERRUPT_H
+#define ESP8266TIMERINTERRUPT_H
 
 #if !defined(ESP8266)
   #error This code is designed to run on ESP8266 and ESP8266-based boards! Please check your Tools->Board setting.
 #endif
 
-#define ESP8266_TIMER_INTERRUPT_VERSION       "ESP8266TimerInterrupt v1.1.1"
+#ifndef ESP8266_TIMER_INTERRUPT_VERSION
+  #define ESP8266_TIMER_INTERRUPT_VERSION       "ESP8266TimerInterrupt v1.2.0"
+#endif
 
 #ifndef TIMER_INTERRUPT_DEBUG
   #define TIMER_INTERRUPT_DEBUG      0
 #endif
 
+#include "TimerInterrupt_Generic_Debug.h"
 
 /* From /arduino-1.8.10/hardware/esp8266com/esp8266/cores/esp8266/esp8266_peri.h
 
@@ -84,7 +91,7 @@ typedef ESP8266TimerInterrupt ESP8266Timer;
 #define MAX_ESP8266_NUM_TIMERS      1
 #define MAX_ESP8266_COUNT           8388607
 
-typedef void (*timer_callback)  (void);
+typedef void (*timer_callback)  ();
 
 
 class ESP8266TimerInterrupt
@@ -123,9 +130,7 @@ class ESP8266TimerInterrupt
       }
 
       // count up
-#if (TIMER_INTERRUPT_DEBUG > 0)
-      Serial.println("ESP8266TimerInterrupt: _fre = " + String(_frequency) + ", _count = " + String(_timerCount));
-#endif
+      TISR_LOGWARN3(F("ESP8266TimerInterrupt: _fre ="), _frequency, F(", _count ="), _timerCount);
 
       // Clock to timer (prescaler) is always 80MHz, even F_CPU is 160 MHz
 
@@ -163,7 +168,7 @@ class ESP8266TimerInterrupt
       timer1_disable();
     }
 
-    void disableTimer(void)
+    void disableTimer()
     {
       timer1_disable();
     }
@@ -176,21 +181,22 @@ class ESP8266TimerInterrupt
     }
 
     // Duration (in milliseconds). Duration = 0 or not specified => run indefinitely
-    void enableTimer(void)
+    void enableTimer()
     {
       reattachInterrupt();
     }
 
     // Just stop clock source, clear the count
-    void stopTimer(void)
+    void stopTimer()
     {
       timer1_disable();
     }
 
     // Just reconnect clock source, start current count from 0
-    void restartTimer(void)
+    void restartTimer()
     {
       enableTimer();
     }
 }; // class ESP8266TimerInterrupt
 
+#endif    // ESP8266TIMERINTERRUPT_H

@@ -1,30 +1,39 @@
 /****************************************************************************************************************************
-   Change_Interval.ino
-   For NRF52 boards using mbed-RTOS such as Nano-33-BLE
-   Written by Khoi Hoang
+  Change_Interval.ino
+  For ESP8266 boards
+  Written by Khoi Hoang
 
-   Built by Khoi Hoang https://github.com/khoih-prog/NRF52_MBED_TimerInterrupt
-   Licensed under MIT license
+  Built by Khoi Hoang https://github.com/khoih-prog/ESP8266TimerInterrupt
+  Licensed under MIT license
 
-   Now even you use all these new 16 ISR-based timers,with their maximum interval practically unlimited (limited only by
-   unsigned long miliseconds), you just consume only one NRF52 timer and avoid conflicting with other cores' tasks.
-   The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
-   Therefore, their executions are not blocked by bad-behaving functions / tasks.
-   This important feature is absolutely necessary for mission-critical tasks.
+  The ESP8266 timers are badly designed, using only 23-bit counter along with maximum 256 prescaler. They're only better than UNO / Mega.
+  The ESP8266 has two hardware timers, but timer0 has been used for WiFi and it's not advisable to use. Only timer1 is available.
+  The timer1's 23-bit counter terribly can count only up to 8,388,607. So the timer1 maximum interval is very short.
+  Using 256 prescaler, maximum timer1 interval is only 26.843542 seconds !!!
 
-   Based on SimpleTimer - A timer library for Arduino.
-   Author: mromani@ottotecnica.com
-   Copyright (c) 2010 OTTOTECNICA Italy
+  Now with these new 16 ISR-based timers, the maximum interval is practically unlimited (limited only by unsigned long miliseconds)
+  The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
+  Therefore, their executions are not blocked by bad-behaving functions / tasks.
+  This important feature is absolutely necessary for mission-critical tasks.
 
-   Based on BlynkTimer.h
-   Author: Volodymyr Shymanskyy
+  Based on SimpleTimer - A timer library for Arduino.
+  Author: mromani@ottotecnica.com
+  Copyright (c) 2010 OTTOTECNICA Italy
 
-   Version: 1.0.2
+  Based on BlynkTimer.h
+  Author: Volodymyr Shymanskyy
 
-   Version Modified By   Date      Comments
-   ------- -----------  ---------- -----------
-   1.0.1   K Hoang      22/11/2020 Initial coding and sync with NRF52_TimerInterrupt
-   1.0.2   K Hoang      23/11/2020 Add and optimize examples
+  Version: 1.2.0
+
+  Version Modified By   Date      Comments
+  ------- -----------  ---------- -----------
+  1.0.0   K Hoang      23/11/2019 Initial coding
+  1.0.1   K Hoang      25/11/2019 New release fixing compiler error
+  1.0.2   K.Hoang      26/11/2019 Permit up to 16 super-long-time, super-accurate ISR-based timers to avoid being blocked
+  1.0.3   K.Hoang      17/05/2020 Restructure code. Fix example. Enhance README.
+  1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
+  1.1.1   K.Hoang      06/12/2020 Add Version String and Change_Interval example to show how to change TimerInterval
+  1.2.0   K.Hoang      08/01/2021 Add better debug feature. Optimize code and examples to reduce RAM usage
 *****************************************************************************************************************************/
 
 /*
@@ -39,100 +48,68 @@
    or the entire sequence of your code which accesses the data.
 */
 
-#if !( ARDUINO_ARCH_NRF52840 && TARGET_NAME == ARDUINO_NANO33BLE )
-  #error This code is designed to run on nRF52-based Nano-33-BLE boards using mbed-RTOS platform! Please check your Tools->Board setting.
+#if !defined(ESP8266)
+  #error This code is designed to run on ESP8266 and ESP8266-based boards! Please check your Tools->Board setting.
 #endif
 
-// These define's must be placed at the beginning before #include "NRF52TimerInterrupt.h"
-// For Nano33-BLE, don't use Serial.print() in ISR as system will definitely hang.
-#define NRF52_MBED_TIMER_INTERRUPT_DEBUG      0
+// These define's must be placed at the beginning before #include "ESP8266TimerInterrupt.h"
+// _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
+// Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
+#define TIMER_INTERRUPT_DEBUG         0
+#define _TIMERINTERRUPT_LOGLEVEL_     0
 
-#include "NRF52_MBED_TimerInterrupt.h"
+#include "ESP8266TimerInterrupt.h"
 
-//#ifndef LED_BUILTIN
-//  #define LED_BUILTIN         D13
-//#endif
-
-#ifndef LED_BLUE_PIN
-  #define LED_BLUE_PIN          D7
+#ifndef LED_BUILTIN
+  #define LED_BUILTIN           D4        // Pin D4 mapped to pin GPIO2/TXD1 of ESP8266, NodeMCU and WeMoS, control on-board LED
 #endif
 
-#ifndef LED_RED_PIN
-  #define LED_RED_PIN           D8
-#endif
 
-#define TIMER0_INTERVAL_MS        500   //1000
-#define TIMER1_INTERVAL_MS        2000
+#define TIMER_INTERVAL_MS        500   //1000
 
-volatile uint32_t Timer0Count = 0;
-volatile uint32_t Timer1Count = 0;
+volatile uint32_t TimerCount = 0;
 
-// Depending on the board, you can select NRF52 Hardware Timer from NRF_TIMER_1,NRF_TIMER_3,NRF_TIMER_4 (1,3 and 4)
-// If you select the already-used NRF_TIMER_0 or NRF_TIMER_2, it'll be auto modified to use NRF_TIMER_1
-
-// Init NRF52 timer NRF_TIMER1
-NRF52_MBED_Timer ITimer0(NRF_TIMER_4);
-
-// Init NRF52 timer NRF_TIMER3
-NRF52_MBED_Timer ITimer1(NRF_TIMER_3);
+// Init ESP8266Timer
+ESP8266Timer ITimer;
 
 void printResult(uint32_t currTime)
 {
-  Serial.printf("Time = %ld, Timer0Count = %lu, , Timer1Count = %lu\n", currTime, Timer0Count, Timer1Count);
+  Serial.print(F("Time = ")); Serial.print(currTime); 
+  Serial.print(F(", TimerCount = ")); Serial.println(TimerCount);
 }
 
-void TimerHandler0(void)
+void TimerHandler()
 {
-  static bool toggle0 = false;
-
-  // Flag for checking to be sure ISR is working as SErial.print is not OK here in ISR
-  Timer0Count++;
-
-  //timer interrupt toggles pin LED_BUILTIN
-  digitalWrite(LED_BUILTIN, toggle0);
-  toggle0 = !toggle0;
-}
-
-void TimerHandler1(void)
-{
-  static bool toggle1 = false;
+  static bool toggle = false;
 
   // Flag for checking to be sure ISR is working as Serial.print is not OK here in ISR
-  Timer1Count++;
-  
-  //timer interrupt toggles outputPin
-  digitalWrite(LED_BLUE_PIN, toggle1);
-  toggle1 = !toggle1;
+  TimerCount++;
+
+  //timer interrupt toggles pin LED_BUILTIN
+  digitalWrite(LED_BUILTIN, toggle);
+  toggle = !toggle;
 }
 
 void setup()
 {
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(LED_BLUE_PIN, OUTPUT);
   
   Serial.begin(115200);
   while (!Serial);
 
   delay(100);
 
-  Serial.printf("\nStarting Change_Interval on %s\n", BOARD_NAME);
-  Serial.printf("Version : v%s\n", NRF52_MBED_TIMER_INTERRUPT_VERSION);
+  Serial.print(F("\nStarting Change_Interval on ")); Serial.println(ARDUINO_BOARD);
+  Serial.println(ESP8266_TIMER_INTERRUPT_VERSION);
+  Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
  
   // Interval in microsecs
-  if (ITimer0.attachInterruptInterval(TIMER0_INTERVAL_MS * 1000, TimerHandler0))
+  if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 1000, TimerHandler))
   {
-    Serial.printf("Starting  ITimer0 OK, millis() = %ld\n", millis());
+    Serial.print(F("Starting  ITimer OK, millis() = ")); Serial.println(millis());
   }
   else
-    Serial.println("Can't set ITimer0. Select another freq. or timer");
-
-  // Interval in microsecs
-  if (ITimer1.attachInterruptInterval(TIMER1_INTERVAL_MS * 1000, TimerHandler1))
-  {
-    Serial.printf("Starting  ITimer1 OK, millis() = %ld\n", millis());
-  }
-  else
-    Serial.println("Can't set ITimer1. Select another freq. or timer");
+    Serial.println(F("Can't set ITimer. Select another freq. or timer"));
 }
 
 #define CHECK_INTERVAL_MS     10000L
@@ -157,10 +134,9 @@ void loop()
       //setInterval(unsigned long interval, timerCallback callback)
       multFactor = (multFactor + 1) % 2;
       
-      ITimer0.setInterval(TIMER0_INTERVAL_MS * 1000 * (multFactor + 1), TimerHandler0);
-      ITimer1.setInterval(TIMER1_INTERVAL_MS * 1000 * (multFactor + 1), TimerHandler1);
+      ITimer.setInterval(TIMER_INTERVAL_MS * 1000 * (multFactor + 1), TimerHandler);
 
-      Serial.printf("Changing Interval, Timer0 = %lu,  Timer1 = %lu\n", TIMER0_INTERVAL_MS * (multFactor + 1), TIMER1_INTERVAL_MS * (multFactor + 1));
+      Serial.print(F("Changing Interval, Timer = ")); Serial.println(TIMER_INTERVAL_MS * (multFactor + 1));
       
       lastChangeTime = currTime;
     }

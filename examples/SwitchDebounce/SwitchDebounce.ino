@@ -1,38 +1,39 @@
 /****************************************************************************************************************************
-   SwitchDebounce.ino
-   For ESP8266 boards
-   Written by Khoi Hoang
+  SwitchDebounce.ino
+  For ESP8266 boards
+  Written by Khoi Hoang
 
-   Built by Khoi Hoang https://github.com/khoih-prog/ESP8266TimerInterrupt
-   Licensed under MIT license
+  Built by Khoi Hoang https://github.com/khoih-prog/ESP8266TimerInterrupt
+  Licensed under MIT license
 
-   The ESP8266 timers are badly designed, using only 23-bit counter along with maximum 256 prescaler. They're only better than UNO / Mega.
-   The ESP8266 has two hardware timers, but timer0 has been used for WiFi and it's not advisable to use. Only timer1 is available.
-   The timer1's 23-bit counter terribly can count only up to 8,388,607. So the timer1 maximum interval is very short.
-   Using 256 prescaler, maximum timer1 interval is only 26.843542 seconds !!!
+  The ESP8266 timers are badly designed, using only 23-bit counter along with maximum 256 prescaler. They're only better than UNO / Mega.
+  The ESP8266 has two hardware timers, but timer0 has been used for WiFi and it's not advisable to use. Only timer1 is available.
+  The timer1's 23-bit counter terribly can count only up to 8,388,607. So the timer1 maximum interval is very short.
+  Using 256 prescaler, maximum timer1 interval is only 26.843542 seconds !!!
 
-   Now with these new 16 ISR-based timers, the maximum interval is practically unlimited (limited only by unsigned long miliseconds)
-   The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
-   Therefore, their executions are not blocked by bad-behaving functions / tasks.
-   This important feature is absolutely necessary for mission-critical tasks.
+  Now with these new 16 ISR-based timers, the maximum interval is practically unlimited (limited only by unsigned long miliseconds)
+  The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
+  Therefore, their executions are not blocked by bad-behaving functions / tasks.
+  This important feature is absolutely necessary for mission-critical tasks.
 
-   Based on SimpleTimer - A timer library for Arduino.
-   Author: mromani@ottotecnica.com
-   Copyright (c) 2010 OTTOTECNICA Italy
+  Based on SimpleTimer - A timer library for Arduino.
+  Author: mromani@ottotecnica.com
+  Copyright (c) 2010 OTTOTECNICA Italy
 
-   Based on BlynkTimer.h
-   Author: Volodymyr Shymanskyy
-  
-   Version: 1.1.1
-   
-   Version Modified By   Date      Comments
-   ------- -----------  ---------- -----------
-    1.0.0   K Hoang      23/11/2019 Initial coding
-    1.0.1   K Hoang      25/11/2019 New release fixing compiler error
-    1.0.2   K.Hoang      26/11/2019 Permit up to 16 super-long-time, super-accurate ISR-based timers to avoid being blocked
-    1.0.3   K.Hoang      17/05/2020 Restructure code. Fix example. Enhance README.
-    1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
-    1.1.1   K.Hoang      06/12/2020 Add Version String and Change_Interval example to show how to change TimerInterval
+  Based on BlynkTimer.h
+  Author: Volodymyr Shymanskyy
+
+  Version: 1.2.0
+
+  Version Modified By   Date      Comments
+  ------- -----------  ---------- -----------
+  1.0.0   K Hoang      23/11/2019 Initial coding
+  1.0.1   K Hoang      25/11/2019 New release fixing compiler error
+  1.0.2   K.Hoang      26/11/2019 Permit up to 16 super-long-time, super-accurate ISR-based timers to avoid being blocked
+  1.0.3   K.Hoang      17/05/2020 Restructure code. Fix example. Enhance README.
+  1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
+  1.1.1   K.Hoang      06/12/2020 Add Version String and Change_Interval example to show how to change TimerInterval
+  1.2.0   K.Hoang      08/01/2021 Add better debug feature. Optimize code and examples to reduce RAM usage
 *****************************************************************************************************************************/
 /* Notes:
    Special design is necessary to share data between interrupt code and the rest of your program.
@@ -56,8 +57,10 @@
 #endif
 
 // These define's must be placed at the beginning before #include "ESP8266TimerInterrupt.h"
-// Don't define TIMER_INTERRUPT_DEBUG > 2. Only for special ISR debugging only. Can hang the system.
-#define TIMER_INTERRUPT_DEBUG      1
+// _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
+// Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
+#define TIMER_INTERRUPT_DEBUG         0
+#define _TIMERINTERRUPT_LOGLEVEL_     0
 
 #include "ESP8266TimerInterrupt.h"
 
@@ -82,8 +85,12 @@ void ICACHE_RAM_ATTR TimerHandler()
   static unsigned int debounceCountSWPressed  = 0;
   static unsigned int debounceCountSWReleased = 0;
 
+#if (LOCAL_DEBUG > 0)
   static unsigned long SWPressedTime;
   static unsigned long SWReleasedTime;
+
+  unsigned long currentMillis = millis();
+#endif
 
   static bool started = false;
 
@@ -103,10 +110,10 @@ void ICACHE_RAM_ATTR TimerHandler()
       // Call and flag SWPressed
       if (!SWPressed)
       {
-        SWPressedTime = millis();
-
 #if (LOCAL_DEBUG > 0)
-        Serial.println("SW Press, from millis() = " + String(SWPressedTime - DEBOUNCING_INTERVAL_MS));
+        SWPressedTime = currentMillis;
+        
+        Serial.print("SW Press, from millis() = "); Serial.println(SWPressedTime - DEBOUNCING_INTERVAL_MS);
 #endif
 
         SWPressed = true;
@@ -121,8 +128,9 @@ void ICACHE_RAM_ATTR TimerHandler()
         if (!SWLongPressed)
         {
 #if (LOCAL_DEBUG > 0)
-          Serial.println("SW Long Pressed, total time ms = " + String(millis()) + " - " + String(SWPressedTime - DEBOUNCING_INTERVAL_MS)
-                         + " = " + String(millis() - SWPressedTime + DEBOUNCING_INTERVAL_MS) );
+          Serial.print("SW Long Pressed, total time ms = "); Serial.print(currentMillis);
+          Serial.print(" - "); Serial.print(SWPressedTime - DEBOUNCING_INTERVAL_MS);
+          Serial.print(" = "); Serial.println(currentMillis - SWPressedTime + DEBOUNCING_INTERVAL_MS);       
 #endif
 
           SWLongPressed = true;
@@ -138,10 +146,12 @@ void ICACHE_RAM_ATTR TimerHandler()
     // Start debouncing counting debounceCountSWReleased and clear debounceCountSWPressed
     if ( SWPressed && (++debounceCountSWReleased >= DEBOUNCING_INTERVAL_MS / TIMER_INTERVAL_MS))
     {
-      SWReleasedTime = millis();
-
       // Call and flag SWPressed
 #if (LOCAL_DEBUG > 0)
+      SWReleasedTime = currentMillis;
+
+      // Call and flag SWPressed
+      Serial.print("SW Released, from millis() = "); Serial.println(SWReleasedTime);
       Serial.println("SW Released, from millis() = " + String(SWReleasedTime));
 #endif
 
@@ -154,7 +164,7 @@ void ICACHE_RAM_ATTR TimerHandler()
 
       // Call and flag SWPressed
 #if (LOCAL_DEBUG > 0)
-      Serial.println("SW Pressed total time ms = " + String(SWReleasedTime - SWPressedTime));
+      Serial.print("SW Pressed total time ms = "); Serial.println(SWReleasedTime - SWPressedTime);
 #endif
 
       debounceCountSWPressed = 0;
@@ -169,15 +179,17 @@ void setup()
   
   delay(200);
 
-  Serial.println("\nStarting SwitchDebounce on " + String(ARDUINO_BOARD));
+  Serial.print(F("\nStarting SwitchDebounce on ")); Serial.println(ARDUINO_BOARD);
   Serial.println(ESP8266_TIMER_INTERRUPT_VERSION);
-  Serial.println("CPU Frequency = " + String(F_CPU / 1000000) + " MHz");
+  Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
 
   // Interval in microsecs
   if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 1000, TimerHandler))
-    Serial.println("Starting  ITimer OK, millis() = " + String(millis()));
+  {
+    Serial.print(F("Starting ITimer OK, millis() = ")); Serial.println(millis());
+  }
   else
-    Serial.println("Can't set ITimer. Select another freq., duration or timer");
+    Serial.println(F("Can't set ITimer. Select another freq. or timer"));
 }
 
 void loop()

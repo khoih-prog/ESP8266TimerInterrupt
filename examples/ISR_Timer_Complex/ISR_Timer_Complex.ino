@@ -1,38 +1,39 @@
 /****************************************************************************************************************************
-   ISR_Timer_Complex.ino
-   For ESP8266 boards
-   Written by Khoi Hoang
+  ISR_Timer_Complex.ino
+  For ESP8266 boards
+  Written by Khoi Hoang
 
-   Built by Khoi Hoang https://github.com/khoih-prog/ESP8266TimerInterrupt
-   Licensed under MIT license
+  Built by Khoi Hoang https://github.com/khoih-prog/ESP8266TimerInterrupt
+  Licensed under MIT license
 
-   The ESP8266 timers are badly designed, using only 23-bit counter along with maximum 256 prescaler. They're only better than UNO / Mega.
-   The ESP8266 has two hardware timers, but timer0 has been used for WiFi and it's not advisable to use. Only timer1 is available.
-   The timer1's 23-bit counter terribly can count only up to 8,388,607. So the timer1 maximum interval is very short.
-   Using 256 prescaler, maximum timer1 interval is only 26.843542 seconds !!!
+  The ESP8266 timers are badly designed, using only 23-bit counter along with maximum 256 prescaler. They're only better than UNO / Mega.
+  The ESP8266 has two hardware timers, but timer0 has been used for WiFi and it's not advisable to use. Only timer1 is available.
+  The timer1's 23-bit counter terribly can count only up to 8,388,607. So the timer1 maximum interval is very short.
+  Using 256 prescaler, maximum timer1 interval is only 26.843542 seconds !!!
 
-   Now with these new 16 ISR-based timers, the maximum interval is practically unlimited (limited only by unsigned long miliseconds)
-   The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
-   Therefore, their executions are not blocked by bad-behaving functions / tasks.
-   This important feature is absolutely necessary for mission-critical tasks.
+  Now with these new 16 ISR-based timers, the maximum interval is practically unlimited (limited only by unsigned long miliseconds)
+  The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
+  Therefore, their executions are not blocked by bad-behaving functions / tasks.
+  This important feature is absolutely necessary for mission-critical tasks.
 
-   Based on SimpleTimer - A timer library for Arduino.
-   Author: mromani@ottotecnica.com
-   Copyright (c) 2010 OTTOTECNICA Italy
+  Based on SimpleTimer - A timer library for Arduino.
+  Author: mromani@ottotecnica.com
+  Copyright (c) 2010 OTTOTECNICA Italy
 
-   Based on BlynkTimer.h
-   Author: Volodymyr Shymanskyy
-  
-   Version: 1.1.1
-   
-   Version Modified By   Date      Comments
-   ------- -----------  ---------- -----------
-    1.0.0   K Hoang      23/11/2019 Initial coding
-    1.0.1   K Hoang      25/11/2019 New release fixing compiler error
-    1.0.2   K.Hoang      26/11/2019 Permit up to 16 super-long-time, super-accurate ISR-based timers to avoid being blocked
-    1.0.3   K.Hoang      17/05/2020 Restructure code. Fix example. Enhance README.
-    1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
-    1.1.1   K.Hoang      06/12/2020 Add Version String and Change_Interval example to show how to change TimerInterval
+  Based on BlynkTimer.h
+  Author: Volodymyr Shymanskyy
+
+  Version: 1.2.0
+
+  Version Modified By   Date      Comments
+  ------- -----------  ---------- -----------
+  1.0.0   K Hoang      23/11/2019 Initial coding
+  1.0.1   K Hoang      25/11/2019 New release fixing compiler error
+  1.0.2   K.Hoang      26/11/2019 Permit up to 16 super-long-time, super-accurate ISR-based timers to avoid being blocked
+  1.0.3   K.Hoang      17/05/2020 Restructure code. Fix example. Enhance README.
+  1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
+  1.1.1   K.Hoang      06/12/2020 Add Version String and Change_Interval example to show how to change TimerInterval
+  1.2.0   K.Hoang      08/01/2021 Add better debug feature. Optimize code and examples to reduce RAM usage
 *****************************************************************************************************************************/
 /* Notes:
    Special design is necessary to share data between interrupt code and the rest of your program.
@@ -89,8 +90,10 @@ char ssid[]     = "****";
 char pass[]     = "****";
 
 // These define's must be placed at the beginning before #include "ESP8266TimerInterrupt.h"
-// Don't define TIMER_INTERRUPT_DEBUG > 2. Only for special ISR debugging only. Can hang the system.
-#define TIMER_INTERRUPT_DEBUG      1
+// _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
+// Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
+#define TIMER_INTERRUPT_DEBUG         0
+#define _TIMERINTERRUPT_LOGLEVEL_     0
 
 #include "ESP8266TimerInterrupt.h"
 #include "ESP8266_ISR_Timer.h"
@@ -105,7 +108,7 @@ char pass[]     = "****";
 
 volatile uint32_t lastMillis = 0;
 
-// Init ESP32 timer 0
+// Init ESP8266 timer 0
 ESP8266Timer ITimer;
 
 // Init BlynkTimer
@@ -113,7 +116,7 @@ ESP8266_ISR_Timer ISR_Timer;
 
 BlynkTimer blynkTimer;
 
-void ICACHE_RAM_ATTR TimerHandler(void)
+void ICACHE_RAM_ATTR TimerHandler()
 {
   static bool toggle = false;
   static bool started = false;
@@ -133,10 +136,10 @@ void ICACHE_RAM_ATTR TimerHandler(void)
       pinMode(LED_BUILTIN, OUTPUT);
     }
   
-    #if (TIMER_INTERRUPT_DEBUG > 0)
-    Serial.println("Delta ms = " + String(millis() - lastMillis));
+#if (TIMER_INTERRUPT_DEBUG > 0)
+    Serial.print("Delta ms = "); Serial.println(millis() - lastMillis);
     lastMillis = millis();
-    #endif
+#endif
     
     //timer interrupt toggles pin LED_BUILTIN
     digitalWrite(LED_BUILTIN, toggle);
@@ -146,34 +149,46 @@ void ICACHE_RAM_ATTR TimerHandler(void)
 
 void ICACHE_RAM_ATTR doingSomething2s()
 {
+#if (TIMER_INTERRUPT_DEBUG > 0)  
   static unsigned long previousMillis = lastMillis;
-  
-  Serial.println("doingSomething2s: Delta ms = " + String(millis() - previousMillis));
+
+  Serial.print("doingSomething2s: Delta ms = "); Serial.println(millis() - previousMillis);
+
   previousMillis = millis();
+#endif
 }
 
 void ICACHE_RAM_ATTR doingSomething5s()
 {
+#if (TIMER_INTERRUPT_DEBUG > 0)  
   static unsigned long previousMillis = lastMillis;
-  
-  Serial.println("doingSomething5s: Delta ms = " + String(millis() - previousMillis));
+
+  Serial.print("doingSomething5s: Delta ms = "); Serial.println(millis() - previousMillis);
+
   previousMillis = millis();
+#endif
 }
 
 void ICACHE_RAM_ATTR doingSomething10s()
 {
+#if (TIMER_INTERRUPT_DEBUG > 0)  
   static unsigned long previousMillis = lastMillis;
-  
-  Serial.println("doingSomething10s: Delta ms = " + String(millis() - previousMillis));
+
+  Serial.print("doingSomething10s: Delta ms = "); Serial.println(millis() - previousMillis);
+
   previousMillis = millis();
+#endif
 }
 
 void ICACHE_RAM_ATTR doingSomething50s()
 {
+#if (TIMER_INTERRUPT_DEBUG > 0)  
   static unsigned long previousMillis = lastMillis;
-  
-  Serial.println("doingSomething50s: Delta ms = " + String(millis() - previousMillis));
+
+  Serial.print("doingSomething50s: Delta ms = "); Serial.println(millis() - previousMillis);
+
   previousMillis = millis();
+#endif
 }
 
 #define BLYNK_TIMER_MS        2000L
@@ -181,7 +196,10 @@ void ICACHE_RAM_ATTR doingSomething50s()
 void blynkDoingSomething2s()
 {
   static unsigned long previousMillis = lastMillis;
-  Serial.println("blynkDoingSomething2s: Delta programmed ms = " + String(BLYNK_TIMER_MS) + ", actual = " + String(millis() - previousMillis));
+  
+  Serial.print(F("blynkDoingSomething2s: Delta programmed ms = ")); Serial.print(BLYNK_TIMER_MS);
+  Serial.print(F(", actual = ")); Serial.println(millis() - previousMillis);
+  
   previousMillis = millis();
 }
 
@@ -192,18 +210,18 @@ void setup()
   
   delay(200);
 
-  Serial.println("\nStarting ISR_Timer_Complex on " + String(ARDUINO_BOARD));
+  Serial.print(F("\nStarting ISR_Timer_Complex on ")); Serial.println(ARDUINO_BOARD);
   Serial.println(ESP8266_TIMER_INTERRUPT_VERSION);
-  Serial.println("CPU Frequency = " + String(F_CPU / 1000000) + " MHz");
+  Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
   
   // Interval in microsecs
   if (ITimer.attachInterruptInterval(HW_TIMER_INTERVAL_MS * 1000, TimerHandler))
   {
     lastMillis = millis();
-    Serial.println("Starting  ITimer OK, millis() = " + String(lastMillis));
+    Serial.print(F("Starting  ITimer OK, millis() = ")); Serial.println(lastMillis);
   }
   else
-    Serial.println("Can't set ITimer correctly. Select another freq. or interval");
+    Serial.println(F("Can't set ITimer correctly. Select another freq. or interval"));
 
   // Just to demonstrate, don't use too many ISR Timers if not absolutely necessary
   ISR_Timer.setInterval(2000L, doingSomething2s);  
@@ -230,17 +248,15 @@ void setup()
   Blynk.connect();
 
   if (Blynk.connected())
-    Serial.println("Blynk connected");
+    Serial.println(F("Blynk connected"));
   else
-    Serial.println("Blynk not connected yet");  
+    Serial.println(F("Blynk not connected yet"));
 }
 
 #define BLOCKING_TIME_MS      3000L
 
 void loop()
-{
-  static unsigned long previousMillis = lastMillis;
-  
+{ 
   Blynk.run();
 
   // This unadvised blocking task is used to demonstrate the blocking effects onto the execution and accuracy to Software timer
