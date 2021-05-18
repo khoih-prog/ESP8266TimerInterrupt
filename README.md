@@ -48,9 +48,9 @@
   * [ 11. TimerInterruptTest](examples/TimerInterruptTest)
 * [Example ISR_Timer_Complex](#example-isr_timer_complex)
 * [Debug Terminal Output Samples](#debug-terminal-output-samples)
-  * [1. ISR_Timer_Complex on ESP8266_NODEMCU](#1-isr_timer_complex-on-esp8266_nodemcu)
-  * [2. TimerInterruptTest on ESP8266_NODEMCU](#2-timerinterrupttest-on-esp8266_nodemcu)
-  * [3. Change_Interval on ESP8266_NODEMCU](#3-change_interval-on-esp8266_nodemcu)
+  * [1. ISR_Timer_Complex on ESP8266_NODEMCU_ESP12E](#1-isr_timer_complex-on-esp8266_nodemcu_esp12e)
+  * [2. TimerInterruptTest on ESP8266_NODEMCU_ESP12E](#2-timerinterrupttest-on-esp8266_nodemcu_esp12e)
+  * [3. Change_Interval on ESP8266_NODEMCU_ESP12E](#3-change_interval-on-esp8266_nodemcu_esp12e)
 * [Debug](#debug)
 * [Troubleshooting](#troubleshooting)
 * [Releases](#releases)
@@ -508,14 +508,14 @@ void loop()
 
 ### Debug Terminal Output Samples
 
-### 1. ISR_Timer_Complex on ESP8266_NODEMCU
+### 1. ISR_Timer_Complex on ESP8266_NODEMCU_ESP12E
 
-The following is the sample terminal output when running example [ISR_Timer_Complex](examples/ISR_Timer_Complex) on **ESP8266_NODEMCU** to demonstrate the accuracy of ISR Hardware Timer, **especially when system is very busy**.  The ISR timer is **programmed for 2s, is activated exactly after 2.000s !!!**
+The following is the sample terminal output when running example [ISR_Timer_Complex](examples/ISR_Timer_Complex) on **ESP8266_NODEMCU_ESP12E** to demonstrate the accuracy of ISR Hardware Timer, **especially when system is very busy**.  The ISR timer is **programmed for 2s, is activated exactly after 2.000s !!!**
 
 While software timer, **programmed for 2s, is activated after 4.258s !!!**
 
 ```
-Starting ISR_Timer_Complex on ESP8266_NODEMCU
+Starting ISR_Timer_Complex on ESP8266_NODEMCU_ESP12E
 ESP8266TimerInterrupt v1.3.0
 CPU Frequency = 160 MHz
 ESP8266TimerInterrupt: _fre = 312500.00, _count = 15625
@@ -558,12 +558,12 @@ doingSomething10s: Delta ms = 10000
 
 ---
 
-### 2. TimerInterruptTest on ESP8266_NODEMCU
+### 2. TimerInterruptTest on ESP8266_NODEMCU_ESP12E
 
-The following is the sample terminal output when running example [TimerInterruptTest](examples/TimerInterruptTest) on **ESP8266_NODEMCU** to demonstrate the accuracy of Hardware Timers.
+The following is the sample terminal output when running example [TimerInterruptTest](examples/TimerInterruptTest) on **ESP8266_NODEMCU_ESP12E** to demonstrate the accuracy of Hardware Timers.
 
 ```
-Starting TimerInterruptTest on ESP8266_NODEMCU
+Starting TimerInterruptTest on ESP8266_NODEMCU_ESP12E
 ESP8266TimerInterrupt v1.3.0
 CPU Frequency = 160 MHz
 ESP8266TimerInterrupt: _fre = 312500.00, _count = 312500
@@ -590,12 +590,12 @@ Delta ms = 1000
 
 ---
 
-### 3. Change_Interval on ESP8266_NODEMCU
+### 3. Change_Interval on ESP8266_NODEMCU_ESP12E
 
-The following is the sample terminal output when running example [Change_Interval](examples/Change_Interval) on **ESP8266_NODEMCU** to demonstrate how to change Timer Interval on-the-fly
+The following is the sample terminal output when running example [Change_Interval](examples/Change_Interval) on **ESP8266_NODEMCU_ESP12E** to demonstrate how to change Timer Interval on-the-fly
 
 ```
-Starting Change_Interval on ESP8266_NODEMCU
+Starting Change_Interval on ESP8266_NODEMCU_ESP12E
 ESP8266TimerInterrupt v1.3.0
 CPU Frequency = 160 MHz
 Starting  ITimer OK, millis() = 162
