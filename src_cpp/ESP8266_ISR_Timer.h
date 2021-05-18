@@ -23,7 +23,7 @@
   Based on BlynkTimer.h
   Author: Volodymyr Shymanskyy
 
-  Version: 1.2.0
+  Version: 1.3.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -34,6 +34,7 @@
   1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
   1.1.1   K.Hoang      06/12/2020 Add Version String and Change_Interval example to show how to change TimerInterval
   1.2.0   K.Hoang      08/01/2021 Add better debug feature. Optimize code and examples to reduce RAM usage
+  1.3.0   K.Hoang      18/05/2021 Update to match new ESP8266 core v3.0.0
 *****************************************************************************************************************************/
 
 #pragma once
@@ -46,7 +47,7 @@
 #endif
 
 #ifndef ESP8266_TIMER_INTERRUPT_VERSION
-  #define ESP8266_TIMER_INTERRUPT_VERSION       "ESP8266TimerInterrupt v1.2.0"
+  #define ESP8266_TIMER_INTERRUPT_VERSION       "ESP8266TimerInterrupt v1.3.0"
 #endif
 
 #include "TimerInterrupt_Generic_Debug.h"
@@ -91,74 +92,74 @@ class ESP8266_ISR_Timer
     // constructor
     ESP8266_ISR_Timer();
 
-    void ICACHE_RAM_ATTR init();
+    void IRAM_ATTR init();
 
     // this function must be called inside loop()
-    void ICACHE_RAM_ATTR run();
+    void IRAM_ATTR run();
 
     // Timer will call function 'f' every 'd' milliseconds forever
     // returns the timer number (numTimer) on success or
     // -1 on failure (f == NULL) or no free timers
-    int ICACHE_RAM_ATTR setInterval(unsigned long d, timer_callback f);
+    int IRAM_ATTR setInterval(unsigned long d, timer_callback f);
 
     // Timer will call function 'f' with parameter 'p' every 'd' milliseconds forever
     // returns the timer number (numTimer) on success or
     // -1 on failure (f == NULL) or no free timers
-    int ICACHE_RAM_ATTR setInterval(unsigned long d, timer_callback_p f, void* p);
+    int IRAM_ATTR setInterval(unsigned long d, timer_callback_p f, void* p);
 
     // Timer will call function 'f' after 'd' milliseconds one time
     // returns the timer number (numTimer) on success or
     // -1 on failure (f == NULL) or no free timers
-    int ICACHE_RAM_ATTR setTimeout(unsigned long d, timer_callback f);
+    int IRAM_ATTR setTimeout(unsigned long d, timer_callback f);
 
     // Timer will call function 'f' with parameter 'p' after 'd' milliseconds one time
     // returns the timer number (numTimer) on success or
     // -1 on failure (f == NULL) or no free timers
-    int ICACHE_RAM_ATTR setTimeout(unsigned long d, timer_callback_p f, void* p);
+    int IRAM_ATTR setTimeout(unsigned long d, timer_callback_p f, void* p);
 
     // Timer will call function 'f' every 'd' milliseconds 'n' times
     // returns the timer number (numTimer) on success or
     // -1 on failure (f == NULL) or no free timers
-    int ICACHE_RAM_ATTR setTimer(unsigned long d, timer_callback f, unsigned n);
+    int IRAM_ATTR setTimer(unsigned long d, timer_callback f, unsigned n);
 
     // Timer will call function 'f' with parameter 'p' every 'd' milliseconds 'n' times
     // returns the timer number (numTimer) on success or
     // -1 on failure (f == NULL) or no free timers
-    int ICACHE_RAM_ATTR setTimer(unsigned long d, timer_callback_p f, void* p, unsigned n);
+    int IRAM_ATTR setTimer(unsigned long d, timer_callback_p f, void* p, unsigned n);
 
     // updates interval of the specified timer
-    bool ICACHE_RAM_ATTR changeInterval(unsigned numTimer, unsigned long d);
+    bool IRAM_ATTR changeInterval(unsigned numTimer, unsigned long d);
 
     // destroy the specified timer
-    void ICACHE_RAM_ATTR deleteTimer(unsigned numTimer);
+    void IRAM_ATTR deleteTimer(unsigned numTimer);
 
     // restart the specified timer
-    void ICACHE_RAM_ATTR restartTimer(unsigned numTimer);
+    void IRAM_ATTR restartTimer(unsigned numTimer);
 
     // returns true if the specified timer is enabled
-    bool ICACHE_RAM_ATTR isEnabled(unsigned numTimer);
+    bool IRAM_ATTR isEnabled(unsigned numTimer);
 
     // enables the specified timer
-    void ICACHE_RAM_ATTR enable(unsigned numTimer);
+    void IRAM_ATTR enable(unsigned numTimer);
 
     // disables the specified timer
-    void ICACHE_RAM_ATTR disable(unsigned numTimer);
+    void IRAM_ATTR disable(unsigned numTimer);
 
     // enables all timers
-    void ICACHE_RAM_ATTR enableAll();
+    void IRAM_ATTR enableAll();
 
     // disables all timers
-    void ICACHE_RAM_ATTR disableAll();
+    void IRAM_ATTR disableAll();
 
     // enables the specified timer if it's currently disabled,
     // and vice-versa
-    void ICACHE_RAM_ATTR toggle(unsigned numTimer);
+    void IRAM_ATTR toggle(unsigned numTimer);
 
     // returns the number of used timers
-    unsigned ICACHE_RAM_ATTR getNumTimers();
+    unsigned IRAM_ATTR getNumTimers();
 
     // returns the number of available timers
-    unsigned ICACHE_RAM_ATTR getNumAvailableTimers() 
+    unsigned IRAM_ATTR getNumAvailableTimers() 
     {
       return MAX_TIMERS - numTimers;
     };
@@ -172,10 +173,10 @@ class ESP8266_ISR_Timer
     // low level function to initialize and enable a new timer
     // returns the timer number (numTimer) on success or
     // -1 on failure (f == NULL) or no free timers
-    int ICACHE_RAM_ATTR setupTimer(unsigned long d, void* f, void* p, bool h, unsigned n);
+    int IRAM_ATTR setupTimer(unsigned long d, void* f, void* p, bool h, unsigned n);
 
     // find the first available slot
-    int ICACHE_RAM_ATTR findFirstFreeSlot();
+    int IRAM_ATTR findFirstFreeSlot();
 
     typedef struct 
     {

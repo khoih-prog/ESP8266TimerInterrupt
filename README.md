@@ -123,6 +123,10 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 
 ## Changelog
 
+### Releases v1.3.0
+
+1. Update to match new ESP8266 core v3.0.0
+
 ### Releases v1.2.0
 
 1. Add better debug feature.
@@ -158,7 +162,8 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 ## Prerequisites
 
 1. [`Arduino IDE 1.8.13+`](https://www.arduino.cc/en/Main/Software)
-2. [`ESP8266 Core 2.7.4+`](https://github.com/esp8266/Arduino) for ESP8266-based boards. [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/). To use ESP8266 core 2.7.1+ for LittleFS.
+2. [`ESP8266 Core 3.0.0+`](https://github.com/esp8266/Arduino) for ESP8266-based boards. [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/). To use ESP8266 core 2.7.1+ for LittleFS. 
+3. [`Blynk_WM library v1.5.0+`](https://github.com/khoih-prog/Blynk_WM) to use with some examples. To install. check [![arduino-library-badge](https://www.ardu-badge.com/badge/Blynk_WiFiManager.svg?)](https://www.ardu-badge.com/Blynk_WiFiManager)
 
 ---
 ---
@@ -342,7 +347,7 @@ ESP8266_ISR_Timer ISR_Timer;
 
 BlynkTimer blynkTimer;
 
-void ICACHE_RAM_ATTR TimerHandler()
+void IRAM_ATTR TimerHandler()
 {
   static bool toggle = false;
   static bool started = false;
@@ -373,7 +378,7 @@ void ICACHE_RAM_ATTR TimerHandler()
   }
 }
 
-void ICACHE_RAM_ATTR doingSomething2s()
+void IRAM_ATTR doingSomething2s()
 {
 #if (TIMER_INTERRUPT_DEBUG > 0)  
   static unsigned long previousMillis = lastMillis;
@@ -384,7 +389,7 @@ void ICACHE_RAM_ATTR doingSomething2s()
 #endif
 }
 
-void ICACHE_RAM_ATTR doingSomething5s()
+void IRAM_ATTR doingSomething5s()
 {
 #if (TIMER_INTERRUPT_DEBUG > 0)  
   static unsigned long previousMillis = lastMillis;
@@ -395,7 +400,7 @@ void ICACHE_RAM_ATTR doingSomething5s()
 #endif
 }
 
-void ICACHE_RAM_ATTR doingSomething10s()
+void IRAM_ATTR doingSomething10s()
 {
 #if (TIMER_INTERRUPT_DEBUG > 0)  
   static unsigned long previousMillis = lastMillis;
@@ -406,7 +411,7 @@ void ICACHE_RAM_ATTR doingSomething10s()
 #endif
 }
 
-void ICACHE_RAM_ATTR doingSomething50s()
+void IRAM_ATTR doingSomething50s()
 {
 #if (TIMER_INTERRUPT_DEBUG > 0)  
   static unsigned long previousMillis = lastMillis;
@@ -510,7 +515,7 @@ While software timer, **programmed for 2s, is activated after 4.258s !!!**
 
 ```
 Starting ISR_Timer_Complex on ESP8266_NODEMCU
-ESP8266TimerInterrupt v1.2.0
+ESP8266TimerInterrupt v1.3.0
 CPU Frequency = 160 MHz
 ESP8266TimerInterrupt: _fre = 312500.00, _count = 15625
 Starting  ITimer OK, millis() = 64
@@ -558,7 +563,7 @@ The following is the sample terminal output when running example [TimerInterrupt
 
 ```
 Starting TimerInterruptTest on ESP8266_NODEMCU
-ESP8266TimerInterrupt v1.2.0
+ESP8266TimerInterrupt v1.3.0
 CPU Frequency = 160 MHz
 ESP8266TimerInterrupt: _fre = 312500.00, _count = 312500
 Starting  ITimer OK, millis() = 262
@@ -590,7 +595,7 @@ The following is the sample terminal output when running example [Change_Interva
 
 ```
 Starting Change_Interval on ESP8266_NODEMCU
-ESP8266TimerInterrupt v1.2.0
+ESP8266TimerInterrupt v1.3.0
 CPU Frequency = 160 MHz
 Starting  ITimer OK, millis() = 162
 Time = 10001, TimerCount = 19
@@ -650,6 +655,10 @@ Sometimes, the library will only work if you update the board core to the latest
 ---
 
 ## Releases
+
+### Releases v1.3.0
+
+1. Update to match new ESP8266 core v3.0.0
 
 ### Releases v1.2.0
 
@@ -711,6 +720,7 @@ Submit issues to: [ESP8266TimerInterrupt issues](https://github.com/khoih-prog/E
 2. More hardware-initiated software-enabled timers
 3. Longer time interval
 4. Similar features for remaining Arduino boards such as AVR, Teensy, SAMD21, SAMD51, SAM-DUE, nRF52, ESP32, STM32, etc.
+5. Update to match new ESP8266 core v3.0.0
 
 ---
 ---

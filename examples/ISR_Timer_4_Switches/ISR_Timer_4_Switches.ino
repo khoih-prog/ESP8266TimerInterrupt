@@ -23,7 +23,7 @@
   Based on BlynkTimer.h
   Author: Volodymyr Shymanskyy
 
-  Version: 1.2.0
+  Version: 1.3.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -34,6 +34,7 @@
   1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
   1.1.1   K.Hoang      06/12/2020 Add Version String and Change_Interval example to show how to change TimerInterval
   1.2.0   K.Hoang      08/01/2021 Add better debug feature. Optimize code and examples to reduce RAM usage
+  1.3.0   K.Hoang      18/05/2021 Update to match new ESP8266 core v3.0.0
 *****************************************************************************************************************************/
 /* Notes:
    Special design is necessary to share data between interrupt code and the rest of your program.
@@ -155,17 +156,17 @@ WidgetLED  LampStatus1(LAMPSTATE_PIN1);
 WidgetLED  LampStatus2(LAMPSTATE_PIN2);
 WidgetLED  LampStatus3(LAMPSTATE_PIN3);
 
-void ICACHE_RAM_ATTR Falling0();
-void ICACHE_RAM_ATTR Rising0();
+void IRAM_ATTR Falling0();
+void IRAM_ATTR Rising0();
 
-void ICACHE_RAM_ATTR Falling1();
-void ICACHE_RAM_ATTR Rising1();
+void IRAM_ATTR Falling1();
+void IRAM_ATTR Rising1();
 
-void ICACHE_RAM_ATTR Falling2();
-void ICACHE_RAM_ATTR Rising2();
+void IRAM_ATTR Falling2();
+void IRAM_ATTR Rising2();
 
-void ICACHE_RAM_ATTR Falling3();
-void ICACHE_RAM_ATTR Rising3();
+void IRAM_ATTR Falling3();
+void IRAM_ATTR Rising3();
 
 // This is a struct array, used to simplify programming code and eliminate repetitive code
 // It also reduce code size by reduce number of functions, especially important in ISR code in ICACHE_RAM.
@@ -197,8 +198,8 @@ Lamp_Property_t Lamps[NUMBER_OF_LAMPS] =
 };
 
 
-void ICACHE_RAM_ATTR ButtonCheck();
-void ICACHE_RAM_ATTR ToggleRelay();
+void IRAM_ATTR ButtonCheck();
+void IRAM_ATTR ToggleRelay();
 
 const int resetpin    = 10;
 
@@ -262,7 +263,7 @@ BLYNK_WRITE(VPIN3)
   }
 }
 
-void ICACHE_RAM_ATTR Rising0()
+void IRAM_ATTR Rising0()
 {
   unsigned long currentTime  = millis();
 
@@ -274,7 +275,7 @@ void ICACHE_RAM_ATTR Rising0()
   }
 }
 
-void ICACHE_RAM_ATTR Rising1()
+void IRAM_ATTR Rising1()
 {
   unsigned long currentTime  = millis();
 
@@ -286,7 +287,7 @@ void ICACHE_RAM_ATTR Rising1()
   }
 }
 
-void ICACHE_RAM_ATTR Rising2()
+void IRAM_ATTR Rising2()
 {
   unsigned long currentTime  = millis();
 
@@ -298,7 +299,7 @@ void ICACHE_RAM_ATTR Rising2()
   }
 }
 
-void ICACHE_RAM_ATTR Rising3()
+void IRAM_ATTR Rising3()
 {
   unsigned long currentTime  = millis();
 
@@ -310,7 +311,7 @@ void ICACHE_RAM_ATTR Rising3()
   }
 }
 
-void ICACHE_RAM_ATTR Falling0()
+void IRAM_ATTR Falling0()
 {
   unsigned long currentTime  = millis();
 
@@ -322,7 +323,7 @@ void ICACHE_RAM_ATTR Falling0()
   }
 }
 
-void ICACHE_RAM_ATTR Falling1()
+void IRAM_ATTR Falling1()
 {
   unsigned long currentTime  = millis();
 
@@ -334,7 +335,7 @@ void ICACHE_RAM_ATTR Falling1()
   }
 }
 
-void ICACHE_RAM_ATTR Falling2()
+void IRAM_ATTR Falling2()
 {
   unsigned long currentTime  = millis();
 
@@ -346,7 +347,7 @@ void ICACHE_RAM_ATTR Falling2()
   }
 }
 
-void ICACHE_RAM_ATTR Falling3()
+void IRAM_ATTR Falling3()
 {
   unsigned long currentTime  = millis();
 
@@ -398,7 +399,7 @@ void checkButton()
 }
 
 // Need only one for 4 SWs
-void ICACHE_RAM_ATTR HWCheckButton()
+void IRAM_ATTR HWCheckButton()
 {
   static uint16_t index;
 
@@ -412,7 +413,7 @@ void ICACHE_RAM_ATTR HWCheckButton()
   }
 }
 
-void ICACHE_RAM_ATTR ButtonCheck()
+void IRAM_ATTR ButtonCheck()
 {
   boolean SwitchState;
   static uint16_t index;
@@ -433,7 +434,7 @@ void ICACHE_RAM_ATTR ButtonCheck()
   }
 }
 
-void ICACHE_RAM_ATTR ToggleRelay()
+void IRAM_ATTR ToggleRelay()
 {
   static uint16_t index;
 

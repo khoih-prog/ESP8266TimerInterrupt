@@ -23,7 +23,7 @@
   Based on BlynkTimer.h
   Author: Volodymyr Shymanskyy
 
-  Version: 1.2.0
+  Version: 1.3.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -34,6 +34,7 @@
   1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
   1.1.1   K.Hoang      06/12/2020 Add Version String and Change_Interval example to show how to change TimerInterval
   1.2.0   K.Hoang      08/01/2021 Add better debug feature. Optimize code and examples to reduce RAM usage
+  1.3.0   K.Hoang      18/05/2021 Update to match new ESP8266 core v3.0.0
 *****************************************************************************************************************************/
 
 /* Notes:
@@ -89,12 +90,12 @@ volatile int debounceCounter;
 
 volatile bool activeState = false;
 
-void ICACHE_RAM_ATTR detectRotation()
+void IRAM_ATTR detectRotation()
 {
   activeState = true;
 }
 
-void ICACHE_RAM_ATTR TimerHandler()
+void IRAM_ATTR TimerHandler()
 {
   if ( activeState )
   {

@@ -23,7 +23,7 @@
   Based on BlynkTimer.h
   Author: Volodymyr Shymanskyy
 
-  Version: 1.2.0
+  Version: 1.3.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -34,6 +34,7 @@
   1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
   1.1.1   K.Hoang      06/12/2020 Add Version String and Change_Interval example to show how to change TimerInterval
   1.2.0   K.Hoang      08/01/2021 Add better debug feature. Optimize code and examples to reduce RAM usage
+  1.3.0   K.Hoang      18/05/2021 Update to match new ESP8266 core v3.0.0
 *****************************************************************************************************************************/
 /* Notes:
    Special design is necessary to share data between interrupt code and the rest of your program.
@@ -156,22 +157,22 @@ unsigned int myWiFiTimeout        =  3200L;  //  3.2s WiFi connection timeout   
 unsigned int buttonInterval       =  511L;   //  0.5s update button state
 
 // Lamp1
-void ICACHE_RAM_ATTR Falling();
-void ICACHE_RAM_ATTR Rising();
+void IRAM_ATTR Falling();
+void IRAM_ATTR Rising();
 
-void ICACHE_RAM_ATTR lightOn();
-void ICACHE_RAM_ATTR lightOff();
-void ICACHE_RAM_ATTR ButtonCheck();
-void ICACHE_RAM_ATTR ToggleRelay();
+void IRAM_ATTR lightOn();
+void IRAM_ATTR lightOff();
+void IRAM_ATTR ButtonCheck();
+void IRAM_ATTR ToggleRelay();
 
 // Lamp2
-void ICACHE_RAM_ATTR Falling2();
-void ICACHE_RAM_ATTR Rising2();
+void IRAM_ATTR Falling2();
+void IRAM_ATTR Rising2();
 
-void ICACHE_RAM_ATTR light2On();
-void ICACHE_RAM_ATTR light2Off();
-void ICACHE_RAM_ATTR ButtonCheck2();
-void ICACHE_RAM_ATTR ToggleRelay2();
+void IRAM_ATTR light2On();
+void IRAM_ATTR light2Off();
+void IRAM_ATTR ButtonCheck2();
+void IRAM_ATTR ToggleRelay2();
 
 BlynkTimer Timer;
 
@@ -196,7 +197,7 @@ BLYNK_WRITE(VPIN)
     ToggleRelay();
 }
 
-void ICACHE_RAM_ATTR Rising()
+void IRAM_ATTR Rising()
 {
   unsigned long currentTime  = millis();
   unsigned long TimeDiff;
@@ -210,7 +211,7 @@ void ICACHE_RAM_ATTR Rising()
   }
 }
 
-void ICACHE_RAM_ATTR Falling()
+void IRAM_ATTR Falling()
 {
   unsigned long currentTime  = millis();
 
@@ -230,7 +231,7 @@ BLYNK_WRITE(V2PIN)
     ToggleRelay2();
 }
 
-void ICACHE_RAM_ATTR Rising2()
+void IRAM_ATTR Rising2()
 {
   unsigned long currentTime  = millis();
   unsigned long TimeDiff;
@@ -244,7 +245,7 @@ void ICACHE_RAM_ATTR Rising2()
   }
 }
 
-void ICACHE_RAM_ATTR Falling2()
+void IRAM_ATTR Falling2()
 {
   unsigned long currentTime  = millis();
 
@@ -257,7 +258,7 @@ void ICACHE_RAM_ATTR Falling2()
 }
 
 // Share for both buttons
-void ICACHE_RAM_ATTR HWCheckButton()
+void IRAM_ATTR HWCheckButton()
 {
   // Button 1
   if (!alreadyTriggered && buttonPressed)
@@ -331,7 +332,7 @@ void checkButton()
 }
 
 //Lamp 1
-void ICACHE_RAM_ATTR ButtonCheck()
+void IRAM_ATTR ButtonCheck()
 {
   boolean SwitchState = (digitalRead(BUTTON_PIN));
 
@@ -346,7 +347,7 @@ void ICACHE_RAM_ATTR ButtonCheck()
   }
 }
 
-void ICACHE_RAM_ATTR ToggleRelay()
+void IRAM_ATTR ToggleRelay()
 {
   if (LampState)
     lightOff();
@@ -354,20 +355,20 @@ void ICACHE_RAM_ATTR ToggleRelay()
     lightOn();
 }
 
-void ICACHE_RAM_ATTR lightOn()
+void IRAM_ATTR lightOn()
 {
   digitalWrite(RELAY_PIN, HIGH);
   LampState = true;
 }
 
-void ICACHE_RAM_ATTR lightOff()
+void IRAM_ATTR lightOff()
 {
   digitalWrite(RELAY_PIN, LOW);
   LampState = false;
 }
 
 // Lamp2
-void ICACHE_RAM_ATTR ButtonCheck2()
+void IRAM_ATTR ButtonCheck2()
 {
   boolean SwitchState = (digitalRead(BUTTON2_PIN));
 
@@ -382,7 +383,7 @@ void ICACHE_RAM_ATTR ButtonCheck2()
   }
 }
 
-void ICACHE_RAM_ATTR ToggleRelay2()
+void IRAM_ATTR ToggleRelay2()
 {
   if (Lamp2State)
     light2Off();
@@ -390,13 +391,13 @@ void ICACHE_RAM_ATTR ToggleRelay2()
     light2On();
 }
 
-void ICACHE_RAM_ATTR light2On()
+void IRAM_ATTR light2On()
 {
   digitalWrite(RELAY2_PIN, HIGH);
   Lamp2State = true;
 }
 
-void ICACHE_RAM_ATTR light2Off()
+void IRAM_ATTR light2Off()
 {
   digitalWrite(RELAY2_PIN, LOW);
   Lamp2State = false;
