@@ -23,7 +23,7 @@
   Based on BlynkTimer.h
   Author: Volodymyr Shymanskyy
 
-  Version: 1.3.0
+  Version: 1.4.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -35,6 +35,7 @@
   1.1.1   K.Hoang      06/12/2020 Add Version String and Change_Interval example to show how to change TimerInterval
   1.2.0   K.Hoang      08/01/2021 Add better debug feature. Optimize code and examples to reduce RAM usage
   1.3.0   K.Hoang      18/05/2021 Update to match new ESP8266 core v3.0.0
+  1.4.0   K.Hoang      01/06/2021 Add complex examples. Fix compiler errors due to conflict to some libraries.
 *****************************************************************************************************************************/
 
 #pragma once
@@ -47,7 +48,7 @@
 #endif
 
 #ifndef ESP8266_TIMER_INTERRUPT_VERSION
-  #define ESP8266_TIMER_INTERRUPT_VERSION       "ESP8266TimerInterrupt v1.3.0"
+  #define ESP8266_TIMER_INTERRUPT_VERSION       "ESP8266TimerInterrupt v1.4.0"
 #endif
 
 #include "TimerInterrupt_Generic_Debug.h"
@@ -82,12 +83,13 @@ class ESP8266_ISR_Timer
 {
 
   public:
+
     // maximum number of timers
-    const static int MAX_TIMERS = 16;
+    #define MAX_NUMBER_TIMERS         16
 
     // setTimer() constants
-    const static int RUN_FOREVER = 0;
-    const static int RUN_ONCE = 1;
+    #define TIMER_RUN_FOREVER         0
+    #define TIMER_RUN_ONCE            1
 
     // constructor
     ESP8266_ISR_Timer();
@@ -161,15 +163,14 @@ class ESP8266_ISR_Timer
     // returns the number of available timers
     unsigned IRAM_ATTR getNumAvailableTimers() 
     {
-      return MAX_TIMERS - numTimers;
+      return MAX_NUMBER_TIMERS - numTimers;
     };
 
   private:
     // deferred call constants
-    const static int DEFCALL_DONTRUN = 0;       // don't call the callback function
-    const static int DEFCALL_RUNONLY = 1;       // call the callback function but don't delete the timer
-    const static int DEFCALL_RUNANDDEL = 2;     // call the callback function and delete the timer
-
+#define TIMER_DEFCALL_DONTRUN   0       // don't call the callback function
+#define TIMER_DEFCALL_RUNONLY   1       // call the callback function but don't delete the timer
+#define TIMER_DEFCALL_RUNANDDEL 2       // call the callback function and delete the timer
     // low level function to initialize and enable a new timer
     // returns the timer number (numTimer) on success or
     // -1 on failure (f == NULL) or no free timers
@@ -191,7 +192,7 @@ class ESP8266_ISR_Timer
       unsigned toBeCalled;              // deferred function call (sort of) - N.B.: only used in run()
     } timer_t;
 
-    volatile timer_t timer[MAX_TIMERS];
+    volatile timer_t timer[MAX_NUMBER_TIMERS];
 
     // actual number of timers in use (-1 means uninitialized)
     volatile int numTimers;

@@ -17,6 +17,7 @@
   * [Currently supported Boards](#currently-supported-boards)
   * [Important Notes about ISR](#important-notes-about-isr)
 * [Changelog](#changelog)
+  * [Releases v1.4.0](#releases-v140)
   * [Releases v1.3.0](#releases-v130)
   * [Releases v1.2.0](#releases-v120)
   * [Releases v1.1.1](#releases-v111)
@@ -46,11 +47,15 @@
   * [  9. RPM_Measure](examples/RPM_Measure)
   * [ 10. SwitchDebounce](examples/SwitchDebounce)
   * [ 11. TimerInterruptTest](examples/TimerInterruptTest)
+  * [ 12. ISR_16_Timers_Array](examples/ISR_16_Timers_Array) **New**
+  * [ 13. ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex) **New**
 * [Example ISR_Timer_Complex](#example-isr_timer_complex)
 * [Debug Terminal Output Samples](#debug-terminal-output-samples)
   * [1. ISR_Timer_Complex on ESP8266_NODEMCU_ESP12E](#1-isr_timer_complex-on-esp8266_nodemcu_esp12e)
   * [2. TimerInterruptTest on ESP8266_NODEMCU_ESP12E](#2-timerinterrupttest-on-esp8266_nodemcu_esp12e)
   * [3. Change_Interval on ESP8266_NODEMCU_ESP12E](#3-change_interval-on-esp8266_nodemcu_esp12e)
+  * [4. ISR_16_Timers_Array on ESP8266_NODEMCU_ESP12E](#4-isr_16_timers_array-on-esp8266_nodemcu_esp12e)
+  * [5. ISR_16_Timers_Array_Complex on ESP8266_NODEMCU_ESP12E](#5-isr_16_timers_array_complex-on-esp8266_nodemcu_esp12e)
 * [Debug](#debug)
 * [Troubleshooting](#troubleshooting)
 * [Releases](#releases)
@@ -124,6 +129,11 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 
 ## Changelog
 
+### Releases v1.4.0
+
+1. Fix compiler errors due to conflict to some libraries.
+2. Add complex examples.
+
 ### Releases v1.3.0
 
 1. Update to match new ESP8266 core v3.0.0
@@ -162,7 +172,7 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 
 ## Prerequisites
 
-1. [`Arduino IDE 1.8.13+`](https://www.arduino.cc/en/Main/Software)
+1. [`Arduino IDE 1.8.15+`](https://www.arduino.cc/en/Main/Software)
 2. [`ESP8266 Core 3.0.0+`](https://github.com/esp8266/Arduino) for ESP8266-based boards. [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/). To use ESP8266 core 2.7.1+ for LittleFS. 
 3. [`Blynk_WM library v1.5.0+`](https://github.com/khoih-prog/Blynk_WM) to use with some examples. To install. check [![arduino-library-badge](https://www.ardu-badge.com/badge/Blynk_WiFiManager.svg?)](https://www.ardu-badge.com/Blynk_WiFiManager)
 
@@ -280,7 +290,9 @@ You'll see blynkTimer Software is blocked while system is connecting to WiFi / I
  8. [RPM_Measure](examples/RPM_Measure)
  9. [SwitchDebounce](examples/SwitchDebounce)
 10. [TimerInterruptTest](examples/TimerInterruptTest)
-11. [**Change_Interval**](examples/Change_Interval). New.
+11. [Change_Interval](examples/Change_Interval).
+12. [**ISR_16_Timers_Array**](examples/ISR_16_Timers_Array) **New**
+13. [**ISR_16_Timers_Array_Complex**](examples/ISR_16_Timers_Array_Complex) **New**
 
 ---
 ---
@@ -516,7 +528,7 @@ While software timer, **programmed for 2s, is activated after 4.258s !!!**
 
 ```
 Starting ISR_Timer_Complex on ESP8266_NODEMCU_ESP12E
-ESP8266TimerInterrupt v1.3.0
+ESP8266TimerInterrupt v1.4.0
 CPU Frequency = 160 MHz
 ESP8266TimerInterrupt: _fre = 312500.00, _count = 15625
 Starting  ITimer OK, millis() = 64
@@ -564,7 +576,7 @@ The following is the sample terminal output when running example [TimerInterrupt
 
 ```
 Starting TimerInterruptTest on ESP8266_NODEMCU_ESP12E
-ESP8266TimerInterrupt v1.3.0
+ESP8266TimerInterrupt v1.4.0
 CPU Frequency = 160 MHz
 ESP8266TimerInterrupt: _fre = 312500.00, _count = 312500
 Starting  ITimer OK, millis() = 262
@@ -596,7 +608,7 @@ The following is the sample terminal output when running example [Change_Interva
 
 ```
 Starting Change_Interval on ESP8266_NODEMCU_ESP12E
-ESP8266TimerInterrupt v1.3.0
+ESP8266TimerInterrupt v1.4.0
 CPU Frequency = 160 MHz
 Starting  ITimer OK, millis() = 162
 Time = 10001, TimerCount = 19
@@ -628,6 +640,229 @@ Time = 180018, TimerCount = 279
 ```
 
 ---
+
+### 4. ISR_16_Timers_Array on ESP8266_NODEMCU_ESP12E
+
+The following is the sample terminal output when running example [ISR_16_Timers_Array](examples/ISR_16_Timers_Array) on **ESP8266_NODEMCU_ESP12E** to demonstrate of ISR Hardware Timer, especially when system is very busy or blocked. The 16 independent ISR timers are programmed to be activated repetitively after certain intervals, is activated exactly after that programmed interval !!!
+
+```
+Starting ISR_16_Timers_Array on ESP8266_NODEMCU_ESP12E
+ESP8266TimerInterrupt v1.4.0
+CPU Frequency = 160 MHz
+Starting ITimer OK, millis() = 175
+1s: Delta ms = 1003, ms = 1178
+1s: Delta ms = 999, ms = 2177
+2s: Delta ms = 2002, ms = 2177
+1s: Delta ms = 1000, ms = 3177
+3s: Delta ms = 3002, ms = 3177
+1s: Delta ms = 1000, ms = 4177
+2s: Delta ms = 2000, ms = 4177
+4s: Delta ms = 4002, ms = 4177
+1s: Delta ms = 1000, ms = 5177
+5s: Delta ms = 5002, ms = 5177
+1s: Delta ms = 1000, ms = 6177
+2s: Delta ms = 2001, ms = 6178
+3s: Delta ms = 3001, ms = 6178
+6s: Delta ms = 6003, ms = 6178
+1s: Delta ms = 1000, ms = 7177
+7s: Delta ms = 7002, ms = 7177
+1s: Delta ms = 1000, ms = 8177
+2s: Delta ms = 1999, ms = 8177
+4s: Delta ms = 4000, ms = 8177
+8s: Delta ms = 8002, ms = 8177
+1s: Delta ms = 1000, ms = 9177
+3s: Delta ms = 2999, ms = 9177
+9s: Delta ms = 9002, ms = 9177
+simpleTimerDoingSomething2s: Delta programmed ms = 2000, actual = 10002
+1s: Delta ms = 1000, ms = 10177
+2s: Delta ms = 2000, ms = 10177
+5s: Delta ms = 5001, ms = 10178
+10s: Delta ms = 10006, ms = 10181
+1s: Delta ms = 1000, ms = 11177
+11s: Delta ms = 11003, ms = 11178
+1s: Delta ms = 1000, ms = 12177
+2s: Delta ms = 2000, ms = 12177
+3s: Delta ms = 3000, ms = 12177
+4s: Delta ms = 4000, ms = 12177
+6s: Delta ms = 5999, ms = 12177
+12s: Delta ms = 12005, ms = 12180
+1s: Delta ms = 1000, ms = 13177
+13s: Delta ms = 13002, ms = 13177
+1s: Delta ms = 1000, ms = 14177
+2s: Delta ms = 2000, ms = 14177
+7s: Delta ms = 7000, ms = 14177
+14s: Delta ms = 14002, ms = 14177
+1s: Delta ms = 1000, ms = 15177
+3s: Delta ms = 3000, ms = 15177
+5s: Delta ms = 4999, ms = 15177
+15s: Delta ms = 15002, ms = 15177
+1s: Delta ms = 1000, ms = 16177
+2s: Delta ms = 2000, ms = 16177
+4s: Delta ms = 4001, ms = 16178
+8s: Delta ms = 8001, ms = 16178
+16s: Delta ms = 16003, ms = 16178
+1s: Delta ms = 1000, ms = 17177
+1s: Delta ms = 1000, ms = 18177
+2s: Delta ms = 2000, ms = 18177
+3s: Delta ms = 3000, ms = 18177
+6s: Delta ms = 6000, ms = 18177
+9s: Delta ms = 9001, ms = 18178
+1s: Delta ms = 1000, ms = 19177
+simpleTimerDoingSomething2s: Delta programmed ms = 2000, actual = 10000
+```
+
+---
+
+### 5. ISR_16_Timers_Array_Complex on ESP8266_NODEMCU_ESP12E
+
+The following is the sample terminal output when running example [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex) on **ESP8266_NODEMCU_ESP12E** to demonstrate of ISR Hardware Timer, especially when system is very busy or blocked. The 16 independent ISR timers are programmed to be activated repetitively after certain intervals, is activated exactly after that programmed interval !!!
+
+
+```
+Starting ISR_16_Timers_Array_Complex on ESP8266_NODEMCU_ESP12E
+ESP8266TimerInterrupt v1.4.0
+CPU Frequency = 160 MHz
+Starting ITimer OK, millis() = 177
+SimpleTimer : 2, ms : 10179, Dms : 10000
+Timer : 0, programmed : 5000, actual : 5008
+Timer : 1, programmed : 10000, actual : 0
+Timer : 2, programmed : 15000, actual : 0
+Timer : 3, programmed : 20000, actual : 0
+Timer : 4, programmed : 25000, actual : 0
+Timer : 5, programmed : 30000, actual : 0
+Timer : 6, programmed : 35000, actual : 0
+Timer : 7, programmed : 40000, actual : 0
+Timer : 8, programmed : 45000, actual : 0
+Timer : 9, programmed : 50000, actual : 0
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2, ms : 20232, Dms : 10053
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 10000
+Timer : 2, programmed : 15000, actual : 15008
+Timer : 3, programmed : 20000, actual : 20008
+Timer : 4, programmed : 25000, actual : 0
+Timer : 5, programmed : 30000, actual : 0
+Timer : 6, programmed : 35000, actual : 0
+Timer : 7, programmed : 40000, actual : 0
+Timer : 8, programmed : 45000, actual : 0
+Timer : 9, programmed : 50000, actual : 0
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2, ms : 30286, Dms : 10054
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 10000
+Timer : 2, programmed : 15000, actual : 15000
+Timer : 3, programmed : 20000, actual : 20008
+Timer : 4, programmed : 25000, actual : 25008
+Timer : 5, programmed : 30000, actual : 30008
+Timer : 6, programmed : 35000, actual : 0
+Timer : 7, programmed : 40000, actual : 0
+Timer : 8, programmed : 45000, actual : 0
+Timer : 9, programmed : 50000, actual : 0
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2, ms : 40341, Dms : 10055
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 10000
+Timer : 2, programmed : 15000, actual : 15000
+Timer : 3, programmed : 20000, actual : 20000
+Timer : 4, programmed : 25000, actual : 25008
+Timer : 5, programmed : 30000, actual : 30008
+Timer : 6, programmed : 35000, actual : 35008
+Timer : 7, programmed : 40000, actual : 40008
+Timer : 8, programmed : 45000, actual : 0
+Timer : 9, programmed : 50000, actual : 0
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2, ms : 50396, Dms : 10055
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 10000
+Timer : 2, programmed : 15000, actual : 15000
+Timer : 3, programmed : 20000, actual : 20000
+Timer : 4, programmed : 25000, actual : 25000
+Timer : 5, programmed : 30000, actual : 30008
+Timer : 6, programmed : 35000, actual : 35008
+Timer : 7, programmed : 40000, actual : 40008
+Timer : 8, programmed : 45000, actual : 45008
+Timer : 9, programmed : 50000, actual : 50008
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2, ms : 60452, Dms : 10056
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 10000
+Timer : 2, programmed : 15000, actual : 15000
+Timer : 3, programmed : 20000, actual : 20000
+Timer : 4, programmed : 25000, actual : 25000
+Timer : 5, programmed : 30000, actual : 30000
+Timer : 6, programmed : 35000, actual : 35008
+Timer : 7, programmed : 40000, actual : 40008
+Timer : 8, programmed : 45000, actual : 45008
+Timer : 9, programmed : 50000, actual : 50008
+Timer : 10, programmed : 55000, actual : 55008
+Timer : 11, programmed : 60000, actual : 60008
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2, ms : 70509, Dms : 10057
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 10000
+Timer : 2, programmed : 15000, actual : 15000
+Timer : 3, programmed : 20000, actual : 20000
+Timer : 4, programmed : 25000, actual : 25000
+Timer : 5, programmed : 30000, actual : 30000
+Timer : 6, programmed : 35000, actual : 35000
+Timer : 7, programmed : 40000, actual : 40008
+Timer : 8, programmed : 45000, actual : 45008
+Timer : 9, programmed : 50000, actual : 50008
+Timer : 10, programmed : 55000, actual : 55008
+Timer : 11, programmed : 60000, actual : 60008
+Timer : 12, programmed : 65000, actual : 65008
+Timer : 13, programmed : 70000, actual : 70008
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2, ms : 80566, Dms : 10057
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 10000
+Timer : 2, programmed : 15000, actual : 15000
+Timer : 3, programmed : 20000, actual : 20000
+Timer : 4, programmed : 25000, actual : 25000
+Timer : 5, programmed : 30000, actual : 30000
+Timer : 6, programmed : 35000, actual : 35000
+Timer : 7, programmed : 40000, actual : 40000
+Timer : 8, programmed : 45000, actual : 45008
+Timer : 9, programmed : 50000, actual : 50008
+Timer : 10, programmed : 55000, actual : 55008
+Timer : 11, programmed : 60000, actual : 60008
+Timer : 12, programmed : 65000, actual : 65008
+Timer : 13, programmed : 70000, actual : 70008
+Timer : 14, programmed : 75000, actual : 75008
+Timer : 15, programmed : 80000, actual : 80008
+
+```
+
+---
 ---
 
 ### Debug
@@ -656,6 +891,11 @@ Sometimes, the library will only work if you update the board core to the latest
 ---
 
 ## Releases
+
+### Releases v1.4.0
+
+1. Fix compiler errors due to conflict to some libraries.
+2. Add complex examples.
 
 ### Releases v1.3.0
 
@@ -722,6 +962,8 @@ Submit issues to: [ESP8266TimerInterrupt issues](https://github.com/khoih-prog/E
 3. Longer time interval
 4. Similar features for remaining Arduino boards such as AVR, Teensy, SAMD21, SAMD51, SAM-DUE, nRF52, ESP32, STM32, etc.
 5. Update to match new ESP8266 core v3.0.0
+6. Fix compiler errors due to conflict to some libraries.
+7. Add complex examples.
 
 ---
 ---

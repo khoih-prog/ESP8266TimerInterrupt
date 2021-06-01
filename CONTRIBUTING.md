@@ -14,7 +14,7 @@ If you don't find anything, please [open a new issue](https://github.com/khoih-p
 
 Please ensure to specify the following:
 
-* Arduino IDE version (e.g. 1.8.13) or Platform.io version
+* Arduino IDE version (e.g. 1.8.15) or Platform.io version
 * `ESP8266` Core Version (e.g. ESP8266 core v3.0.0)
 * Contextual information (e.g. what you were trying to achieve)
 * Simplest possible steps to reproduce
@@ -26,7 +26,7 @@ Please ensure to specify the following:
 ### Example
 
 ```
-Arduino IDE version: v1.8.13
+Arduino IDE version: v1.8.15
 ESP8266 Core Version v3.0.0
 ESP8266_NODEMCU
 OS: Ubuntu 20.04 LTS
