@@ -15,27 +15,6 @@
   The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
-
-  Based on SimpleTimer - A timer library for Arduino.
-  Author: mromani@ottotecnica.com
-  Copyright (c) 2010 OTTOTECNICA Italy
-
-  Based on BlynkTimer.h
-  Author: Volodymyr Shymanskyy
-
-  Version: 1.4.0
-
-  Version Modified By   Date      Comments
-  ------- -----------  ---------- -----------
-  1.0.0   K Hoang      23/11/2019 Initial coding
-  1.0.1   K Hoang      25/11/2019 New release fixing compiler error
-  1.0.2   K.Hoang      26/11/2019 Permit up to 16 super-long-time, super-accurate ISR-based timers to avoid being blocked
-  1.0.3   K.Hoang      17/05/2020 Restructure code. Fix example. Enhance README.
-  1.1.0   K.Hoang      27/10/2020 Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
-  1.1.1   K.Hoang      06/12/2020 Add Version String and Change_Interval example to show how to change TimerInterval
-  1.2.0   K.Hoang      08/01/2021 Add better debug feature. Optimize code and examples to reduce RAM usage
-  1.3.0   K.Hoang      18/05/2021 Update to match new ESP8266 core v3.0.0
-  1.4.0   K.Hoang      01/06/2021 Add complex examples. Fix compiler errors due to conflict to some libraries.
 *****************************************************************************************************************************/
 /* Notes:
    Special design is necessary to share data between interrupt code and the rest of your program.
@@ -61,7 +40,7 @@
 // These define's must be placed at the beginning before #include "ESP8266TimerInterrupt.h"
 // _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
 // Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
-#define TIMER_INTERRUPT_DEBUG         0
+#define TIMER_INTERRUPT_DEBUG         1
 #define _TIMERINTERRUPT_LOGLEVEL_     0
 
 #include "ESP8266TimerInterrupt.h"
@@ -74,9 +53,9 @@ unsigned int SWPin = PIN_D1;
 #define DEBOUNCING_INTERVAL_MS    100
 #define LONG_PRESS_INTERVAL_MS    5000
 
-#define LOCAL_DEBUG               1
+//#define LOCAL_DEBUG               1
 
-// Init ESP8266 timer
+// Init ESP8266 timer 1
 ESP8266Timer ITimer;
 
 volatile bool SWPressed     = false;
@@ -87,20 +66,14 @@ void IRAM_ATTR TimerHandler()
   static unsigned int debounceCountSWPressed  = 0;
   static unsigned int debounceCountSWReleased = 0;
 
-#if (LOCAL_DEBUG > 0)
+#if (TIMER_INTERRUPT_DEBUG > 0)
   static unsigned long SWPressedTime;
   static unsigned long SWReleasedTime;
 
-  unsigned long currentMillis = millis();
+  static unsigned long currentMillis;
 #endif
 
-  static bool started = false;
-
-  if (!started)
-  {
-    started = true;
-    pinMode(SWPin, INPUT_PULLUP);
-  }
+  currentMillis = millis();
 
   if ( (!digitalRead(SWPin)) )
   {
@@ -112,7 +85,7 @@ void IRAM_ATTR TimerHandler()
       // Call and flag SWPressed
       if (!SWPressed)
       {
-#if (LOCAL_DEBUG > 0)
+#if (TIMER_INTERRUPT_DEBUG > 0)
         SWPressedTime = currentMillis;
         
         Serial.print("SW Press, from millis() = "); Serial.println(SWPressedTime - DEBOUNCING_INTERVAL_MS);
@@ -129,7 +102,7 @@ void IRAM_ATTR TimerHandler()
         // Call and flag SWLongPressed
         if (!SWLongPressed)
         {
-#if (LOCAL_DEBUG > 0)
+#if (TIMER_INTERRUPT_DEBUG > 0)
           Serial.print("SW Long Pressed, total time ms = "); Serial.print(currentMillis);
           Serial.print(" - "); Serial.print(SWPressedTime - DEBOUNCING_INTERVAL_MS);
           Serial.print(" = "); Serial.println(currentMillis - SWPressedTime + DEBOUNCING_INTERVAL_MS);       
@@ -149,12 +122,11 @@ void IRAM_ATTR TimerHandler()
     if ( SWPressed && (++debounceCountSWReleased >= DEBOUNCING_INTERVAL_MS / TIMER_INTERVAL_MS))
     {
       // Call and flag SWPressed
-#if (LOCAL_DEBUG > 0)
-      SWReleasedTime = currentMillis;
+#if (TIMER_INTERRUPT_DEBUGEBUG > 0)
+      SWReleasedTime = millis();
 
       // Call and flag SWPressed
-      Serial.print("SW Released, from millis() = "); Serial.println(SWReleasedTime);
-      Serial.println("SW Released, from millis() = " + String(SWReleasedTime));
+      Serial.print("SW Released, from millis() = "); Serial.println(millis());
 #endif
 
       SWPressed     = false;
@@ -165,8 +137,8 @@ void IRAM_ATTR TimerHandler()
       //Your_Response_To_Release();
 
       // Call and flag SWPressed
-#if (LOCAL_DEBUG > 0)
-      Serial.print("SW Pressed total time ms = "); Serial.println(SWReleasedTime - SWPressedTime);
+#if (TIMER_INTERRUPT_DEBUG > 0)
+      Serial.print("SW Pressed total time ms = "); Serial.println(millis() - SWPressedTime);
 #endif
 
       debounceCountSWPressed = 0;
@@ -176,6 +148,8 @@ void IRAM_ATTR TimerHandler()
 
 void setup()
 {
+  pinMode(SWPin, INPUT_PULLUP);
+  
   Serial.begin(115200);
   while (!Serial);
   

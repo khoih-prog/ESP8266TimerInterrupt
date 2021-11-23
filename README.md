@@ -16,14 +16,7 @@
   * [Why using ISR-based Hardware Timer Interrupt is better](#why-using-isr-based-hardware-timer-interrupt-is-better)
   * [Currently supported Boards](#currently-supported-boards)
   * [Important Notes about ISR](#important-notes-about-isr)
-* [Changelog](#changelog)
-  * [Releases v1.4.0](#releases-v140)
-  * [Releases v1.3.0](#releases-v130)
-  * [Releases v1.2.0](#releases-v120)
-  * [Releases v1.1.1](#releases-v111)
-  * [Releases v1.1.0](#releases-v110)
-  * [Releases v1.0.3](#releases-v103)
-  * [Releases v1.0.2](#releases-v102)
+* [Changelog](changelog.md)
 * [Prerequisites](#prerequisites)
 * [Installation](#installation)
   * [Use Arduino Library Manager](#use-arduino-library-manager)
@@ -35,30 +28,32 @@
   * [2. ESP8266 hardware timers' functions](#2-esp8266-hardware-timers-functions)
   * [3. How to use PWM analogWrite() functions while using this library](#3-how-to-use-pwm-analogwrite-functions-while-using-this-library)
 * [More useful Information](#more-useful-information)
+* [Usage](#usage)
+  * [1. Using only Hardware Timer directly](#1-using-only-hardware-timer-directly)
+    * [1.1 Init Hardware Timer](#11-init-hardware-timer)
+    * [1.2 Set Hardware Timer Interval and attach Timer Interrupt Handler function](#12-set-hardware-timer-interval-and-attach-timer-interrupt-handler-function)
+    * [1.3 Set Hardware Timer Frequency and attach Timer Interrupt Handler function](#13-set-hardware-timer-frequency-and-attach-timer-interrupt-handler-function)
+  * [2. Using 16 ISR_based Timers from 1 Hardware Timer](#2-using-16-isr_based-timers-from-1-hardware-timer)
+    * [2.1 Important Note](#21-important-note)
+    * [2.2 Init Hardware Timer and ISR-based Timer](#22-init-hardware-timer-and-isr-based-timer)
+    * [2.3 Set Hardware Timer Interval and attach Timer Interrupt Handler functions](#23-set-hardware-timer-interval-and-attach-timer-interrupt-handler-functions)
 * [Examples](#examples)
-  * [  1. Argument_None](examples/Argument_None)
-  * [  2. **Change_Interval**](examples/Change_Interval). New.
-  * [  3. ISR_RPM_Measure](examples/ISR_RPM_Measure)
-  * [  4. ISR_Switch](examples/ISR_Switch)
-  * [  5. ISR_Timer_Complex](examples/ISR_Timer_Complex)
-  * [  6. ISR_Timer_Switch](examples/ISR_Timer_Switch)
-  * [  7. ISR_Timer_4_Switches](examples/ISR_Timer_4_Switches)
-  * [  8. ISR_Timer_Switches](examples/ISR_Timer_Switches)
-  * [  9. RPM_Measure](examples/RPM_Measure)
-  * [ 10. SwitchDebounce](examples/SwitchDebounce)
-  * [ 11. TimerInterruptTest](examples/TimerInterruptTest)
-  * [ 12. ISR_16_Timers_Array](examples/ISR_16_Timers_Array) **New**
-  * [ 13. ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex) **New**
+  * [ 1. Argument_None](examples/Argument_None)
+  * [ 2. **Change_Interval**](examples/Change_Interval). New.
+  * [ 3. ISR_RPM_Measure](examples/ISR_RPM_Measure)
+  * [ 4. RPM_Measure](examples/RPM_Measure)
+  * [ 5. SwitchDebounce](examples/SwitchDebounce)
+  * [ 6. TimerInterruptTest](examples/TimerInterruptTest)
+  * [ 7. ISR_16_Timers_Array](examples/ISR_16_Timers_Array) **New**
+  * [ 8. ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex) **New**
 * [Example ISR_Timer_Complex](#example-isr_timer_complex)
 * [Debug Terminal Output Samples](#debug-terminal-output-samples)
-  * [1. ISR_Timer_Complex on ESP8266_NODEMCU_ESP12E](#1-isr_timer_complex-on-esp8266_nodemcu_esp12e)
-  * [2. TimerInterruptTest on ESP8266_NODEMCU_ESP12E](#2-timerinterrupttest-on-esp8266_nodemcu_esp12e)
-  * [3. Change_Interval on ESP8266_NODEMCU_ESP12E](#3-change_interval-on-esp8266_nodemcu_esp12e)
-  * [4. ISR_16_Timers_Array on ESP8266_NODEMCU_ESP12E](#4-isr_16_timers_array-on-esp8266_nodemcu_esp12e)
-  * [5. ISR_16_Timers_Array_Complex on ESP8266_NODEMCU_ESP12E](#5-isr_16_timers_array_complex-on-esp8266_nodemcu_esp12e)
+  * [1. TimerInterruptTest on ESP8266_NODEMCU_ESP12E](#1-timerinterrupttest-on-esp8266_nodemcu_esp12e)
+  * [2. Change_Interval on ESP8266_NODEMCU_ESP12E](#2-change_interval-on-esp8266_nodemcu_esp12e)
+  * [3. ISR_16_Timers_Array on ESP8266_NODEMCU_ESP12E](#3-isr_16_timers_array-on-esp8266_nodemcu_esp12e)
+  * [4. ISR_16_Timers_Array_Complex on ESP8266_NODEMCU_ESP12E](#4-isr_16_timers_array_complex-on-esp8266_nodemcu_esp12e)
 * [Debug](#debug)
 * [Troubleshooting](#troubleshooting)
-* [Releases](#releases)
 * [Issues](#issues)
 * [TO DO](#to-do)
 * [DONE](#done)
@@ -127,55 +122,12 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 ---
 ---
 
-## Changelog
-
-### Releases v1.4.0
-
-1. Fix compiler errors due to conflict to some libraries.
-2. Add complex examples.
-
-### Releases v1.3.0
-
-1. Update to match new ESP8266 core v3.0.0
-
-### Releases v1.2.0
-
-1. Add better debug feature.
-2. Optimize code and examples to reduce RAM usage
-
-### Releases v1.1.1
-
-1. Add [**Change_Interval**](examples/Change_Interval) example to show how to change TimerInterval on-the-fly
-2. Add Version String
-
-### Releases v1.1.0
-
-1. Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
-2. Update examples.
-3. Enhance README.
-
-### Releases v1.0.3
-
-1. Restructure code.
-2. Fix example.
-3. Enhance README.
-
-### Releases v1.0.2
-
-1. Basic hardware timers for ESP8266.
-2. Fix compatibility issue causing compiler error while using Arduino IDEs before 1.8.10 and ESP8266 cores 2.5.2 and before
-3. More hardware-initiated software-enabled timers
-4. Longer time interval
-
----
----
 
 ## Prerequisites
 
-1. [`Arduino IDE 1.8.15+`](https://www.arduino.cc/en/Main/Software)
-2. [`ESP8266 Core 3.0.0+`](https://github.com/esp8266/Arduino) for ESP8266-based boards. [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/). To use ESP8266 core 2.7.1+ for LittleFS. 
-3. [`Blynk_WM library v1.6.0+`](https://github.com/khoih-prog/Blynk_WM) to use with some examples. To install. check [![arduino-library-badge](https://www.ardu-badge.com/badge/Blynk_WiFiManager.svg?)](https://www.ardu-badge.com/Blynk_WiFiManager)
-4. [`SimpleTimer library`](https://github.com/jfturcot/SimpleTimer) to use with some examples.
+1. [`Arduino IDE 1.8.16+`](https://www.arduino.cc/en/Main/Software)
+2. [`ESP8266 Core 3.0.2+`](https://github.com/esp8266/Arduino) for ESP8266-based boards. [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/). To use ESP8266 core 2.7.1+ for LittleFS. 
+3. [`SimpleTimer library`](https://github.com/jfturcot/SimpleTimer) to use with some examples.
 
 
 ---
@@ -279,61 +231,201 @@ You'll see blynkTimer Software is blocked while system is connecting to WiFi / I
 ---
 ---
 
+## Usage
+
+The ESP8266 timers are badly designed, using only 23-bit counter along with maximum 256 prescaler. They're only better than UNO / Mega.
+
+The ESP8266 has two hardware timers, but Timer0 has been used for WiFi and it's not advisable to use. Only Timer1 is available.
+
+The Timer1's 23-bit counter can terribly count only up to 8,388,607. So the timer1 maximum interval is very short.
+Using 256 prescaler, maximum Timer1 interval is only 26.843542 seconds !!!
+
+### 1. Using only Hardware Timer directly
+
+### 1.1 Init Hardware Timer
+
+```
+// Init ESP8266 only and only Timer 1
+ESP8266Timer ITimer;
+```
+
+### 1.2 Set Hardware Timer Interval and attach Timer Interrupt Handler function
+
+Use one of these functions with **interval in unsigned long milliseconds**
+
+```
+// interval (in microseconds) and duration (in milliseconds). Duration = 0 or not specified => run indefinitely
+// No params and duration now. To be addes in the future by adding similar functions here or to esp32-hal-timer.c
+bool setInterval(unsigned long interval, timer_callback callback)
+
+// interval (in microseconds) and duration (in milliseconds). Duration = 0 or not specified => run indefinitely
+// No params and duration now. To be addes in the future by adding similar functions here or to esp32-hal-timer.c
+bool attachInterruptInterval(unsigned long interval, timer_callback callback)
+```
+
+as follows
+
+```
+void IRAM_ATTR TimerHandler()
+{
+  // Doing something here inside ISR
+}
+
+#define TIMER_INTERVAL_MS        1000
+
+void setup()
+{
+  ....
+  
+  // Interval in microsecs
+  if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 1000, TimerHandler))
+  {
+    lastMillis = millis();
+    Serial.print(F("Starting  ITimer OK, millis() = ")); Serial.println(lastMillis);
+  }
+  else
+    Serial.println(F("Can't set ITimer correctly. Select another freq. or interval"));
+}  
+```
+
+### 1.3 Set Hardware Timer Frequency and attach Timer Interrupt Handler function
+
+Use one of these functions with **frequency in float Hz**
+
+```
+// frequency (in hertz)
+bool setFrequency(float frequency, timer_callback callback)
+
+// frequency (in hertz)
+bool attachInterrupt(float frequency, timer_callback callback)
+```
+
+as follows
+
+```
+void TimerHandler()
+{
+  // Doing something here inside ISR
+}
+
+#define TIMER_FREQ_HZ        5555.555
+
+void setup()
+{
+  ....
+  
+  // Frequency in float Hz
+  if (ITimer.attachInterrupt(TIMER_FREQ_HZ, TimerHandler))
+    Serial.println("Starting  ITimer OK, millis() = " + String(millis()));
+  else
+    Serial.println("Can't set ITimer. Select another freq. or timer");
+}  
+```
+
+
+### 2. Using 16 ISR_based Timers from 1 Hardware Timer
+
+### 2.1 Important Note
+
+The 16 ISR_based Timers, designed for long timer intervals, only support using **unsigned long millisec intervals**. If you have to use much higher frequency or sub-millisecond interval, you have to use the Hardware Timers directly as in [1.3 Set Hardware Timer Frequency and attach Timer Interrupt Handler function](#13-set-hardware-timer-frequency-and-attach-timer-interrupt-handler-function)
+
+### 2.2 Init Hardware Timer and ISR-based Timer
+
+```
+#include "ESP8266TimerInterrupt.h"
+#include "ESP8266_ISR_Timer.h"
+
+// Init ESP8266 timer 1
+ESP8266Timer ITimer;
+
+// Init ESP8266_ISR_Timer
+ESP8266_ISR_Timer ISR_Timer;
+```
+
+### 2.3 Set Hardware Timer Interval and attach Timer Interrupt Handler functions
+
+```
+void IRAM_ATTR TimerHandler()
+{
+  ISR_timer.run();
+}
+
+#define HW_TIMER_INTERVAL_MS          50L
+
+#define TIMER_INTERVAL_2S             2000L
+#define TIMER_INTERVAL_5S             5000L
+#define TIMER_INTERVAL_11S            11000L
+#define TIMER_INTERVAL_101S           101000L
+
+// In AVR, avoid doing something fancy in ISR, for example complex Serial.print with String() argument
+// The pure simple Serial.prints here are just for demonstration and testing. Must be eliminate in working environment
+// Or you can get this run-time error / crash
+void doingSomething2s()
+{
+  // Doing something here inside ISR every 2 seconds
+}
+  
+void doingSomething5s()
+{
+  // Doing something here inside ISR every 5 seconds
+}
+
+void doingSomething11s()
+{
+  // Doing something here inside ISR  every 11 seconds
+}
+
+void doingSomething101s()
+{
+  // Doing something here inside ISR every 101 seconds
+}
+
+void setup()
+{
+  ....
+  
+  // Interval in microsecs
+  if (ITimer.attachInterruptInterval(HW_TIMER_INTERVAL_MS * 1000, TimerHandler))
+  {
+    startMillis = millis();
+    Serial.print(F("Starting ITimer OK, millis() = ")); Serial.println(startMillis);
+  }
+  else
+    Serial.println(F("Can't set ITimer. Select another freq. or timer"));
+
+  // Just to demonstrate, don't use too many ISR Timers if not absolutely necessary
+  // You can use up to 16 timer for each ISR_Timer
+  ISR_timer.setInterval(TIMER_INTERVAL_2S, doingSomething2s);
+  ISR_timer.setInterval(TIMER_INTERVAL_5S, doingSomething5s);
+  ISR_timer.setInterval(TIMER_INTERVAL_11S, doingSomething11s);
+  ISR_timer.setInterval(TIMER_INTERVAL_101S, doingSomething101s);
+}  
+```
+
+---
+---
+
 
 ### Examples: 
 
  1. [Argument_None](examples/Argument_None)
  2. [ISR_RPM_Measure](examples/ISR_RPM_Measure)
- 3. [ISR_Switch](examples/ISR_Switch) 
- 4. [ISR_Timer_4_Switches](examples/ISR_Timer_4_Switches) 
- 5. [ISR_Timer_Complex](examples/ISR_Timer_Complex)
- 6. [ISR_Timer_Switch](examples/ISR_Timer_Switch)
- 7. [ISR_Timer_Switches](examples/ISR_Timer_Switches) 
- 8. [RPM_Measure](examples/RPM_Measure)
- 9. [SwitchDebounce](examples/SwitchDebounce)
-10. [TimerInterruptTest](examples/TimerInterruptTest)
-11. [Change_Interval](examples/Change_Interval).
-12. [**ISR_16_Timers_Array**](examples/ISR_16_Timers_Array) **New**
-13. [**ISR_16_Timers_Array_Complex**](examples/ISR_16_Timers_Array_Complex) **New**
+ 3. [RPM_Measure](examples/RPM_Measure)
+ 4. [SwitchDebounce](examples/SwitchDebounce)
+ 5. [TimerInterruptTest](examples/TimerInterruptTest)
+ 6. [Change_Interval](examples/Change_Interval).
+ 7. [**ISR_16_Timers_Array**](examples/ISR_16_Timers_Array) **New**
+ 8. [**ISR_16_Timers_Array_Complex**](examples/ISR_16_Timers_Array_Complex) **New**
 
 ---
 ---
 
-### Example [ISR_Timer_Complex](examples/ISR_Timer_Complex)
+### Example [Change_Interval](examples/Change_Interval)
 
 ```cpp
 #if !defined(ESP8266)
   #error This code is designed to run on ESP8266 and ESP8266-based boards! Please check your Tools->Board setting.
 #endif
-
-#define BLYNK_PRINT Serial
-//#define BLYNK_DEBUG true
-
-#include <ESP8266WiFi.h>
-
-#define USE_SSL     false
-
-#if USE_SSL
-  #include <BlynkSimpleEsp8266_SSL.h>
-  #define BLYNK_HARDWARE_PORT     9443
-#else
-  #include <BlynkSimpleEsp8266.h>
-  #define BLYNK_HARDWARE_PORT     8080
-#endif
-
-#define USE_LOCAL_SERVER    true
-
-// If local server
-#if USE_LOCAL_SERVER
-  char blynk_server[]   = "account.duckdns.org";
-  //char blynk_server[]   = "192.168.2.110";
-#else
-  char blynk_server[]   = "";
-#endif
-
-char auth[]     = "****";
-char ssid[]     = "****";
-char pass[]     = "****";
 
 // These define's must be placed at the beginning before #include "ESP8266TimerInterrupt.h"
 // _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
@@ -342,178 +434,88 @@ char pass[]     = "****";
 #define _TIMERINTERRUPT_LOGLEVEL_     0
 
 #include "ESP8266TimerInterrupt.h"
-#include "ESP8266_ISR_Timer.h"
 
 #ifndef LED_BUILTIN
-  #define LED_BUILTIN       2         // Pin D4 mapped to pin GPIO2/TXD1 of ESP8266, NodeMCU and WeMoS, control on-board LED
+  #define LED_BUILTIN           D4        // Pin D4 mapped to pin GPIO2/TXD1 of ESP8266, NodeMCU and WeMoS, control on-board LED
 #endif
 
-#define HW_TIMER_INTERVAL_MS        50
 
-#define WIFI_TIMEOUT      20000L
+#define TIMER_INTERVAL_MS        500   //1000
 
-volatile uint32_t lastMillis = 0;
+volatile uint32_t TimerCount = 0;
 
-// Init ESP8266 timer 0
+// Init ESP8266 timer 1
 ESP8266Timer ITimer;
 
-// Init BlynkTimer
-ESP8266_ISR_Timer ISR_Timer;
+void printResult(uint32_t currTime)
+{
+  Serial.print(F("Time = ")); Serial.print(currTime); 
+  Serial.print(F(", TimerCount = ")); Serial.println(TimerCount);
+}
 
-BlynkTimer blynkTimer;
-
-void IRAM_ATTR TimerHandler()
+void TimerHandler()
 {
   static bool toggle = false;
-  static bool started = false;
 
-  static int timeRun      = 0;
+  // Flag for checking to be sure ISR is working as Serial.print is not OK here in ISR
+  TimerCount++;
 
-  ISR_Timer.run();
-
-  // Toggle LED every 50 x 100 = 5000ms = 5s
-  if (++timeRun == 100)
-  { 
-    timeRun = 0;
-
-    if (!started)
-    {
-      started = true;
-      pinMode(LED_BUILTIN, OUTPUT);
-    }
-  
-#if (TIMER_INTERRUPT_DEBUG > 0)
-    Serial.print("Delta ms = "); Serial.println(millis() - lastMillis);
-    lastMillis = millis();
-#endif
-    
-    //timer interrupt toggles pin LED_BUILTIN
-    digitalWrite(LED_BUILTIN, toggle);
-    toggle = !toggle;
-  }
-}
-
-void IRAM_ATTR doingSomething2s()
-{
-#if (TIMER_INTERRUPT_DEBUG > 0)  
-  static unsigned long previousMillis = lastMillis;
-
-  Serial.print("doingSomething2s: Delta ms = "); Serial.println(millis() - previousMillis);
-
-  previousMillis = millis();
-#endif
-}
-
-void IRAM_ATTR doingSomething5s()
-{
-#if (TIMER_INTERRUPT_DEBUG > 0)  
-  static unsigned long previousMillis = lastMillis;
-
-  Serial.print("doingSomething5s: Delta ms = "); Serial.println(millis() - previousMillis);
-
-  previousMillis = millis();
-#endif
-}
-
-void IRAM_ATTR doingSomething10s()
-{
-#if (TIMER_INTERRUPT_DEBUG > 0)  
-  static unsigned long previousMillis = lastMillis;
-
-  Serial.print("doingSomething10s: Delta ms = "); Serial.println(millis() - previousMillis);
-
-  previousMillis = millis();
-#endif
-}
-
-void IRAM_ATTR doingSomething50s()
-{
-#if (TIMER_INTERRUPT_DEBUG > 0)  
-  static unsigned long previousMillis = lastMillis;
-
-  Serial.print("doingSomething50s: Delta ms = "); Serial.println(millis() - previousMillis);
-
-  previousMillis = millis();
-#endif
-}
-
-#define BLYNK_TIMER_MS        2000L
-  
-void blynkDoingSomething2s()
-{
-  static unsigned long previousMillis = lastMillis;
-  
-  Serial.print(F("blynkDoingSomething2s: Delta programmed ms = ")); Serial.print(BLYNK_TIMER_MS);
-  Serial.print(F(", actual = ")); Serial.println(millis() - previousMillis);
-  
-  previousMillis = millis();
+  //timer interrupt toggles pin LED_BUILTIN
+  digitalWrite(LED_BUILTIN, toggle);
+  toggle = !toggle;
 }
 
 void setup()
 {
+  pinMode(LED_BUILTIN, OUTPUT);
+  
   Serial.begin(115200);
   while (!Serial);
-  
-  delay(200);
 
-  Serial.print(F("\nStarting ISR_Timer_Complex on ")); Serial.println(ARDUINO_BOARD);
+  delay(300);
+
+  Serial.print(F("\nStarting Change_Interval on ")); Serial.println(ARDUINO_BOARD);
   Serial.println(ESP8266_TIMER_INTERRUPT_VERSION);
   Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
-  
+ 
   // Interval in microsecs
-  if (ITimer.attachInterruptInterval(HW_TIMER_INTERVAL_MS * 1000, TimerHandler))
+  if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 1000, TimerHandler))
   {
-    lastMillis = millis();
-    Serial.print(F("Starting  ITimer OK, millis() = ")); Serial.println(lastMillis);
+    Serial.print(F("Starting  ITimer OK, millis() = ")); Serial.println(millis());
   }
   else
-    Serial.println(F("Can't set ITimer correctly. Select another freq. or interval"));
-
-  // Just to demonstrate, don't use too many ISR Timers if not absolutely necessary
-  ISR_Timer.setInterval(2000L, doingSomething2s);  
-  ISR_Timer.setInterval(5000L, doingSomething5s);  
-  ISR_Timer.setInterval(10000L, doingSomething10s);  
-  ISR_Timer.setInterval(50000L, doingSomething50s);
-
-  // You need this timer for non-critical tasks. Avoid abusing ISR if not absolutely necessary.
-  blynkTimer.setInterval(BLYNK_TIMER_MS, blynkDoingSomething2s);  
-
-  unsigned long startWiFi = millis();
-  
-  WiFi.begin(ssid, pass);
-  
-  do
-  {
-    delay(200);
-    
-    if ( (WiFi.status() == WL_CONNECTED) || (millis() > startWiFi + WIFI_TIMEOUT) )
-      break;
-  } while (WiFi.status() != WL_CONNECTED);
-  
-  Blynk.config(auth, blynk_server, BLYNK_HARDWARE_PORT);
-  Blynk.connect();
-
-  if (Blynk.connected())
-    Serial.println(F("Blynk connected"));
-  else
-    Serial.println(F("Blynk not connected yet"));
+    Serial.println(F("Can't set ITimer. Select another freq. or timer"));
 }
 
-#define BLOCKING_TIME_MS      3000L
+#define CHECK_INTERVAL_MS     10000L
+#define CHANGE_INTERVAL_MS    20000L
 
 void loop()
-{ 
-  Blynk.run();
+{
+  static uint32_t lastTime = 0;
+  static uint32_t lastChangeTime = 0;
+  static uint32_t currTime;
+  static uint32_t multFactor = 0;
 
-  // This unadvised blocking task is used to demonstrate the blocking effects onto the execution and accuracy to Software timer
-  // You see the time elapse of ISR_Timer still accurate, whereas very unaccurate for Software Timer
-  // The time elapse for 2000ms software timer now becomes 3000ms (BLOCKING_TIME_MS)
-  // While that of ISR_Timer is still prefect.
-  delay(BLOCKING_TIME_MS);
-  
-  // You need this Software timer for non-critical tasks. Avoid abusing ISR if not absolutely necessary
-  // You don't need to and never call ISR_Timer.run() here in the loop(). It's already handled by ISR timer.
-  blynkTimer.run();
+  currTime = millis();
+
+  if (currTime - lastTime > CHECK_INTERVAL_MS)
+  {
+    printResult(currTime);
+    lastTime = currTime;
+
+    if (currTime - lastChangeTime > CHANGE_INTERVAL_MS)
+    {
+      //setInterval(unsigned long interval, timerCallback callback)
+      multFactor = (multFactor + 1) % 2;
+      
+      ITimer.setInterval(TIMER_INTERVAL_MS * 1000 * (multFactor + 1), TimerHandler);
+
+      Serial.print(F("Changing Interval, Timer = ")); Serial.println(TIMER_INTERVAL_MS * (multFactor + 1));
+      
+      lastChangeTime = currTime;
+    }
+  }
 }
 ```
 
@@ -522,63 +524,13 @@ void loop()
 
 ### Debug Terminal Output Samples
 
-### 1. ISR_Timer_Complex on ESP8266_NODEMCU_ESP12E
-
-The following is the sample terminal output when running example [ISR_Timer_Complex](examples/ISR_Timer_Complex) on **ESP8266_NODEMCU_ESP12E** to demonstrate the accuracy of ISR Hardware Timer, **especially when system is very busy**.  The ISR timer is **programmed for 2s, is activated exactly after 2.000s !!!**
-
-While software timer, **programmed for 2s, is activated after 4.258s !!!**
-
-```
-Starting ISR_Timer_Complex on ESP8266_NODEMCU_ESP12E
-ESP8266TimerInterrupt v1.4.0
-CPU Frequency = 160 MHz
-ESP8266TimerInterrupt: _fre = 312500.00, _count = 15625
-Starting  ITimer OK, millis() = 64
-doingSomething2s: Delta ms = 2000   // ISR_Timer, 2000ms interval, still working even if blocked by WiFi/Blynk connecting tasks
-doingSomething2s: Delta ms = 2000
-doingSomething5s: Delta ms = 5000
-Delta ms = 5000                     //ISR_Timer, 5000ms interval, blynking an LED
-doingSomething2s: Delta ms = 2000
-[6159] 
-    ___  __          __
-   / _ )/ /_ _____  / /__
-  / _  / / // / _ \/  '_/
- /____/_/\_, /_//_/_/\_\
-        /___/ v0.6.1 on NodeMCU
-
-[6161] Protocol connect: timeout =9000
-[6164] Connecting to ****.duckdns.org:8080
-[6255] Ready (ping: 5ms).
-Blynk connected
-doingSomething2s: Delta ms = 2000  <=== ISR Timer still very accurate while system busy
-blynkDoingSomething2s: Delta programmed ms = 2000, actual = 4258  //Software Timer, 2000ms interval, blocked by WiFi/Blynk connecting tasks
-doingSomething2s: Delta ms = 2000
-doingSomething5s: Delta ms = 5000
-doingSomething10s: Delta ms = 5000
-Delta ms = 5000
-doingSomething2s: Delta ms = 2000
-blynkDoingSomething2s: Delta programmed ms = 2000, actual = 3000  //Software Timer, 2000ms interval, blocked by delay() in loop() to demonstrate bad task.
-doingSomething2s: Delta ms = 2000
-doingSomething5s: Delta ms = 5000
-Delta ms = 5000
-blynkDoingSomething2s: Delta programmed ms = 2000, actual = 3001 <=== Software Timer not accurate when system busy
-doingSomething2s: Delta ms = 2000
-doingSomething2s: Delta ms = 2000
-blynkDoingSomething2s: Delta programmed ms = 2000, actual = 3000 <=== Software Timer not accurate when system busy
-doingSomething2s: Delta ms = 2000
-doingSomething5s: Delta ms = 5000
-doingSomething10s: Delta ms = 10000
-```
-
----
-
-### 2. TimerInterruptTest on ESP8266_NODEMCU_ESP12E
+### 1. TimerInterruptTest on ESP8266_NODEMCU_ESP12E
 
 The following is the sample terminal output when running example [TimerInterruptTest](examples/TimerInterruptTest) on **ESP8266_NODEMCU_ESP12E** to demonstrate the accuracy of Hardware Timers.
 
 ```
 Starting TimerInterruptTest on ESP8266_NODEMCU_ESP12E
-ESP8266TimerInterrupt v1.4.0
+ESP8266TimerInterrupt v1.4.1
 CPU Frequency = 160 MHz
 ESP8266TimerInterrupt: _fre = 312500.00, _count = 312500
 Starting  ITimer OK, millis() = 262
@@ -604,13 +556,13 @@ Delta ms = 1000
 
 ---
 
-### 3. Change_Interval on ESP8266_NODEMCU_ESP12E
+### 2. Change_Interval on ESP8266_NODEMCU_ESP12E
 
 The following is the sample terminal output when running example [Change_Interval](examples/Change_Interval) on **ESP8266_NODEMCU_ESP12E** to demonstrate how to change Timer Interval on-the-fly
 
 ```
 Starting Change_Interval on ESP8266_NODEMCU_ESP12E
-ESP8266TimerInterrupt v1.4.0
+ESP8266TimerInterrupt v1.4.1
 CPU Frequency = 160 MHz
 Starting  ITimer OK, millis() = 162
 Time = 10001, TimerCount = 19
@@ -643,13 +595,13 @@ Time = 180018, TimerCount = 279
 
 ---
 
-### 4. ISR_16_Timers_Array on ESP8266_NODEMCU_ESP12E
+### 3. ISR_16_Timers_Array on ESP8266_NODEMCU_ESP12E
 
 The following is the sample terminal output when running example [ISR_16_Timers_Array](examples/ISR_16_Timers_Array) on **ESP8266_NODEMCU_ESP12E** to demonstrate of ISR Hardware Timer, especially when system is very busy or blocked. The 16 independent ISR timers are programmed to be activated repetitively after certain intervals, is activated exactly after that programmed interval !!!
 
 ```
 Starting ISR_16_Timers_Array on ESP8266_NODEMCU_ESP12E
-ESP8266TimerInterrupt v1.4.0
+ESP8266TimerInterrupt v1.4.1
 CPU Frequency = 160 MHz
 Starting ITimer OK, millis() = 175
 1s: Delta ms = 1003, ms = 1178
@@ -715,14 +667,14 @@ simpleTimerDoingSomething2s: Delta programmed ms = 2000, actual = 10000
 
 ---
 
-### 5. ISR_16_Timers_Array_Complex on ESP8266_NODEMCU_ESP12E
+### 4. ISR_16_Timers_Array_Complex on ESP8266_NODEMCU_ESP12E
 
 The following is the sample terminal output when running example [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex) on **ESP8266_NODEMCU_ESP12E** to demonstrate of ISR Hardware Timer, especially when system is very busy or blocked. The 16 independent ISR timers are programmed to be activated repetitively after certain intervals, is activated exactly after that programmed interval !!!
 
 
 ```
 Starting ISR_16_Timers_Array_Complex on ESP8266_NODEMCU_ESP12E
-ESP8266TimerInterrupt v1.4.0
+ESP8266TimerInterrupt v1.4.1
 CPU Frequency = 160 MHz
 Starting ITimer OK, millis() = 177
 SimpleTimer : 2, ms : 10179, Dms : 10000
@@ -892,56 +844,6 @@ Sometimes, the library will only work if you update the board core to the latest
 ---
 ---
 
-## Releases
-
-### Releases v1.4.0
-
-1. Fix compiler errors due to conflict to some libraries.
-2. Add complex examples.
-
-### Releases v1.3.0
-
-1. Update to match new ESP8266 core v3.0.0
-
-### Releases v1.2.0
-
-1. Add better debug feature.
-2. Optimize code and examples to reduce RAM usage
-
-### Releases v1.1.1
-
-1. Add [**Change_Interval**](examples/Change_Interval) example to show how to change TimerInterval on-the-fly
-2. Add Version String
-
-### Releases v1.1.0
-
-1. Restore cpp code besides Impl.h code to use if Multiple-Definition linker error.
-2. Update examples.
-3. Enhance README.
-
-### Releases v1.0.3
-
-1. Restructure code.
-2. Fix example.
-3. Enhance README.
-
-### Releases v1.0.2
-
-1. Basic hardware timers for ESP8266.
-2. Fix compatibility issue causing compiler error while using Arduino IDEs before 1.8.10 and ESP8266 cores 2.5.2 and before
-3. More hardware-initiated software-enabled timers
-4. Longer time interval
-
-### Releases v1.0.1
-
-1. Fixing compiler error
-
-### Releases v1.0.0
-
-1. Initial coding
-
----
----
 
 ### Issues
 
@@ -953,7 +855,6 @@ Submit issues to: [ESP8266TimerInterrupt issues](https://github.com/khoih-prog/E
 ## TO DO
 
 1. Search for bug and improvement.
-2. Similar features for remaining Arduino boards such as SAMD21, SAMD51, SAM-DUE, nRF52
 
 ---
 
@@ -966,6 +867,7 @@ Submit issues to: [ESP8266TimerInterrupt issues](https://github.com/khoih-prog/E
 5. Update to match new ESP8266 core v3.0.0
 6. Fix compiler errors due to conflict to some libraries.
 7. Add complex examples.
+5. Update to match new ESP8266 core v3.0.2
 
 ---
 ---
