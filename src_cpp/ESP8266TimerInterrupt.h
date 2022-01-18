@@ -180,7 +180,7 @@ class ESP8266TimerInterrupt
     void reattachInterrupt()
     {
       if ( (_frequency != 0) && (_timerCount != 0) && (_callback != NULL) )
-        setFrequency(_frequency, _callback);
+        setFrequency(_frequency / _timerCount, _callback);
     }
 
     // Duration (in milliseconds). Duration = 0 or not specified => run indefinitely
