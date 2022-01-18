@@ -23,7 +23,7 @@
   Based on BlynkTimer.h
   Author: Volodymyr Shymanskyy
 
-  Version: 1.4.1
+  Version: 1.5.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -37,6 +37,7 @@
   1.3.0   K.Hoang      18/05/2021 Update to match new ESP8266 core v3.0.0
   1.4.0   K.Hoang      01/06/2021 Add complex examples. Fix compiler errors due to conflict to some libraries.
   1.4.1   K.Hoang      22/11/2021 Tested with core v3.0.2. Add instructions in README.md
+  1.5.0   K.Hoang      18/01/2022 Fix `multiple-definitions` linker error. Fix bug and add more accurate but shorter timer
 *****************************************************************************************************************************/
 
 #pragma once
@@ -49,8 +50,14 @@
 #endif
 
 #ifndef ESP8266_TIMER_INTERRUPT_VERSION
-  #define ESP8266_TIMER_INTERRUPT_VERSION       "ESP8266TimerInterrupt v1.4.1"
+  #define ESP8266_TIMER_INTERRUPT_VERSION         "ESP8266TimerInterrupt v1.5.0"
 #endif
+
+#define ESP8266_TIMER_INTERRUPT_VERSION_MAJOR     1
+#define ESP8266_TIMER_INTERRUPT_VERSION_MINOR     5
+#define ESP8266_TIMER_INTERRUPT_VERSION_PATCH     0
+
+#define ESP8266_TIMER_INTERRUPT_VERSION_INT      1005000
 
 #ifndef TIMER_INTERRUPT_DEBUG
   #define TIMER_INTERRUPT_DEBUG      0
@@ -96,6 +103,27 @@ typedef ESP8266TimerInterrupt ESP8266Timer;
 
 typedef void (*timer_callback)  ();
 
+#define TIM_DIV1_CLOCK          (80000000UL)          // 80000000 / 1   = 80.0  MHz
+#define TIM_DIV16_CLOCK         (5000000UL)           // 80000000 / 16  = 5.0   MHz
+#define TIM_DIV256_CLOCK        (312500UL)            // 80000000 / 256 = 312.5 KHz
+
+#if ( defined(USING_TIM_DIV1) && USING_TIM_DIV1 )
+  #warning Using TIM_DIV1_CLOCK for shortest and most accurate timer
+  #define TIM_CLOCK_FREQ        TIM_DIV1_CLOCK
+  #define TIM_DIV               TIM_DIV1
+#elif ( defined(USING_TIM_DIV16) && USING_TIM_DIV16 )
+  #warning Using TIM_DIV16_CLOCK for medium time and medium accurate timer
+  #define TIM_CLOCK_FREQ        TIM_DIV16_CLOCK
+  #define TIM_DIV               TIM_DIV16
+#elif ( defined(USING_TIM_DIV256) && USING_TIM_DIV256 )
+  #warning Using TIM_DIV256_CLOCK for longest timer but least accurate
+  #define TIM_CLOCK_FREQ        TIM_DIV256_CLOCK
+  #define TIM_DIV               TIM_DIV256  
+#else
+  #warning Default to using TIM_DIV256_CLOCK for longest timer but least accurate
+  #define TIM_CLOCK_FREQ        TIM_DIV256_CLOCK
+  #define TIM_DIV               TIM_DIV256
+#endif  
 
 class ESP8266TimerInterrupt
 {
@@ -118,11 +146,20 @@ class ESP8266TimerInterrupt
     bool setFrequency(float frequency, timer_callback callback)
     {
       bool isOKFlag = true;
+      float minFreq = (float) TIM_CLOCK_FREQ / MAX_ESP8266_COUNT;
 
       // ESP8266 only has one usable timer1, max count is only 8,388,607. So to get longer time, we use max available 256 divider
       // Will use later if very low frequency is needed.
-      _frequency  = 80000000 / 256;
-      _timerCount = (uint32_t) _frequency / frequency;
+      
+      if (frequency < minFreq)
+      {
+        TISR_LOGERROR3(F("ESP8266TimerInterrupt: Too long Timer, smallest frequency ="), minFreq, F(" for TIM_CLOCK_FREQ ="), TIM_CLOCK_FREQ);
+        
+        return false;
+      }    
+      
+      _frequency  = frequency;     
+      _timerCount = (uint32_t) (TIM_CLOCK_FREQ / frequency);
       _callback   = callback;
 
       if ( _timerCount > MAX_ESP8266_COUNT)
@@ -133,7 +170,7 @@ class ESP8266TimerInterrupt
       }
 
       // count up
-      TISR_LOGWARN3(F("ESP8266TimerInterrupt: _fre ="), _frequency, F(", _count ="), _timerCount);
+      TISR_LOGWARN3(F("ESP8266TimerInterrupt: Timer _fre ="), _frequency, F(", _count ="), _timerCount);
 
       // Clock to timer (prescaler) is always 80MHz, even F_CPU is 160 MHz
 
@@ -142,7 +179,8 @@ class ESP8266TimerInterrupt
       timer1_write(_timerCount);
 
       // Interrupt on EGDE, autoloop
-      timer1_enable(TIM_DIV256, TIM_EDGE, TIM_LOOP);
+      //timer1_enable(TIM_DIV256, TIM_EDGE, TIM_LOOP);
+      timer1_enable(TIM_DIV, TIM_EDGE, TIM_LOOP);
 
       return isOKFlag;
     }
@@ -179,8 +217,8 @@ class ESP8266TimerInterrupt
     // Duration (in milliseconds). Duration = 0 or not specified => run indefinitely
     void reattachInterrupt()
     {
-      if ( (_frequency != 0) && (_timerCount != 0) && (_callback != NULL) )
-        setFrequency(_frequency / _timerCount, _callback);
+      if ( (_frequency > 0) && (_timerCount > 0) && (_callback != NULL) )
+        setFrequency(_frequency, _callback);
     }
 
     // Duration (in milliseconds). Duration = 0 or not specified => run indefinitely

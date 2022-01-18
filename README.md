@@ -161,24 +161,21 @@ Another way to install is to:
 
 ### HOWTO Fix `Multiple Definitions` Linker Error
 
-The current library implementation, using **xyz-Impl.h instead of standard xyz.cpp**, possibly creates certain `Multiple Definitions` Linker error in certain use cases. Although it's simple to just modify several lines of code, either in the library or in the application, the library is adding 2 more source directories
+The current library implementation, using `xyz-Impl.h` instead of standard `xyz.cpp`, possibly creates certain `Multiple Definitions` Linker error in certain use cases.
 
-1. **scr_h** for new h-only files
-2. **src_cpp** for standard h/cpp files
+You can use
 
-besides the standard **src** directory.
+```
+#include <ESP8266_ISR_Timer.hpp>               //https://github.com/khoih-prog/ESP8266TimerInterrupt
+```
 
-To use the **old standard cpp** way, locate this library' directory, then just 
+in many files. But be sure to use the following `#include <ESP8266_ISR_Timer.h>` **in just 1 `.h`, `.cpp` or `.ino` file**, which must **not be included in any other file**, to avoid `Multiple Definitions` Linker Error
 
-1. **Delete the all the files in src directory.**
-2. **Copy all the files in src_cpp directory into src.**
-3. Close then reopen the application code in Arduino IDE, etc. to recompile from scratch.
+```
+// To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
+#include <ESP8266_ISR_Timer.h>                //https://github.com/khoih-prog/ESP8266TimerInterrupt
+```
 
-To re-use the **new h-only** way, just 
-
-1. **Delete the all the files in src directory.**
-2. **Copy the files in src_h directory into src.**
-3. Close then reopen the application code in Arduino IDE, etc. to recompile from scratch.
 
 ---
 ---
@@ -245,6 +242,11 @@ Using 256 prescaler, maximum Timer1 interval is only 26.843542 seconds !!!
 ### 1.1 Init Hardware Timer
 
 ```
+// Select a Timer Clock
+#define USING_TIM_DIV1                false           // for shortest and most accurate timer
+#define USING_TIM_DIV16               false           // for medium time and medium accurate timer
+#define USING_TIM_DIV256              true            // for longest timer but least accurate. Default
+
 // Init ESP8266 only and only Timer 1
 ESP8266Timer ITimer;
 ```
@@ -332,6 +334,11 @@ The 16 ISR_based Timers, designed for long timer intervals, only support using *
 ### 2.2 Init Hardware Timer and ISR-based Timer
 
 ```
+// Select a Timer Clock
+#define USING_TIM_DIV1                false           // for shortest and most accurate timer
+#define USING_TIM_DIV16               false           // for medium time and medium accurate timer
+#define USING_TIM_DIV256              true            // for longest timer but least accurate. Default
+
 #include "ESP8266TimerInterrupt.h"
 #include "ESP8266_ISR_Timer.h"
 
@@ -433,12 +440,16 @@ void setup()
 #define TIMER_INTERRUPT_DEBUG         0
 #define _TIMERINTERRUPT_LOGLEVEL_     0
 
+// Select a Timer Clock
+#define USING_TIM_DIV1                false           // for shortest and most accurate timer
+#define USING_TIM_DIV16               false           // for medium time and medium accurate timer
+#define USING_TIM_DIV256              true            // for longest timer but least accurate. Default
+
 #include "ESP8266TimerInterrupt.h"
 
 #ifndef LED_BUILTIN
   #define LED_BUILTIN           D4        // Pin D4 mapped to pin GPIO2/TXD1 of ESP8266, NodeMCU and WeMoS, control on-board LED
 #endif
-
 
 #define TIMER_INTERVAL_MS        500   //1000
 
@@ -530,7 +541,7 @@ The following is the sample terminal output when running example [TimerInterrupt
 
 ```
 Starting TimerInterruptTest on ESP8266_NODEMCU_ESP12E
-ESP8266TimerInterrupt v1.4.1
+ESP8266TimerInterrupt v1.5.0
 CPU Frequency = 160 MHz
 ESP8266TimerInterrupt: _fre = 312500.00, _count = 312500
 Starting  ITimer OK, millis() = 262
@@ -562,7 +573,7 @@ The following is the sample terminal output when running example [Change_Interva
 
 ```
 Starting Change_Interval on ESP8266_NODEMCU_ESP12E
-ESP8266TimerInterrupt v1.4.1
+ESP8266TimerInterrupt v1.5.0
 CPU Frequency = 160 MHz
 Starting  ITimer OK, millis() = 162
 Time = 10001, TimerCount = 19
@@ -601,7 +612,7 @@ The following is the sample terminal output when running example [ISR_16_Timers_
 
 ```
 Starting ISR_16_Timers_Array on ESP8266_NODEMCU_ESP12E
-ESP8266TimerInterrupt v1.4.1
+ESP8266TimerInterrupt v1.5.0
 CPU Frequency = 160 MHz
 Starting ITimer OK, millis() = 175
 1s: Delta ms = 1003, ms = 1178
@@ -674,7 +685,7 @@ The following is the sample terminal output when running example [ISR_16_Timers_
 
 ```
 Starting ISR_16_Timers_Array_Complex on ESP8266_NODEMCU_ESP12E
-ESP8266TimerInterrupt v1.4.1
+ESP8266TimerInterrupt v1.5.0
 CPU Frequency = 160 MHz
 Starting ITimer OK, millis() = 177
 SimpleTimer : 2, ms : 10179, Dms : 10000
@@ -868,6 +879,9 @@ Submit issues to: [ESP8266TimerInterrupt issues](https://github.com/khoih-prog/E
 6. Fix compiler errors due to conflict to some libraries.
 7. Add complex examples.
 5. Update to match new ESP8266 core v3.0.2
+6. Fix `multiple-definitions` linker error. Drop `src_cpp` and `src_h` directories
+7. Add feature to select among highest, medium or lowest accuracy for Timers for shortest, medium or longest time
+
 
 ---
 ---
@@ -875,11 +889,13 @@ Submit issues to: [ESP8266TimerInterrupt issues](https://github.com/khoih-prog/E
 ## Contributions and thanks
 
 1. Thanks to [Holger Lembke](https://github.com/holgerlembke) to report [ESP8266TimerInterrupt Issue 8: **ESP8266Timer and PWM --> wdt reset**](https://github.com/khoih-prog/ESP8266TimerInterrupt/issues/8), leading to the [HOWTO Use PWM analogWrite() with ESP8266 running Timer1 Interrupt](https://github.com/khoih-prog/ESP8266TimerInterrupt#howto-use-pwm-analogwrite-with-esp8266-running-timer1-interrupt) notes.
+2. Thanks to [Eugene](https://github.com/RushOnline) to make bug-fixing PR and discussion in [bugfix: reattachInterrupt() pass wrong frequency value to setFrequency() #19](https://github.com/khoih-prog/ESP8266TimerInterrupt/pull/19), leading to v1.5.0
 
 
 <table>
   <tr>
     <td align="center"><a href="https://github.com/holgerlembke"><img src="https://github.com/holgerlembke.png" width="100px;" alt="holgerlembke"/><br /><sub><b>Holger Lembke</b></sub></a><br /></td>
+    <td align="center"><a href="https://github.com/RushOnline"><img src="https://github.com/RushOnline.png" width="100px;" alt="RushOnline"/><br /><sub><b>Eugene</b></sub></a><br /></td>
   </tr> 
 </table>
 
