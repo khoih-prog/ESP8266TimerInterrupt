@@ -26,5 +26,5 @@
   "frameworks": "*",
   "platforms": "espressif8266",
   "examples": "examples/*/*/*.ino",
-  "headers": ["ESP8266TimerInterrupt.h", "ESP8266TimerInterrupt.hpp", "ESP8266_ISR_Timer.h"]
+  "headers": ["ESP8266TimerInterrupt.h", "ESP8266_ISR_Timer.hpp", "ESP8266_ISR_Timer.h"]
 }
