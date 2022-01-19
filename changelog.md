@@ -30,6 +30,7 @@
 1. Fix `multiple-definitions` linker error. Drop `src_cpp` and `src_h` directories
 2. Add feature to select among highest, medium or lowest accuracy for Timers for shortest, medium or longest time
 3. Fix reattachInterrupt() bug. Check [bugfix: reattachInterrupt() pass wrong frequency value to setFrequency() #19](https://github.com/khoih-prog/ESP8266TimerInterrupt/pull/19)
+4. Update examples
 
 ### Releases v1.4.1
 
