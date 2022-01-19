@@ -46,7 +46,7 @@
   * [ 6. TimerInterruptTest](examples/TimerInterruptTest)
   * [ 7. ISR_16_Timers_Array](examples/ISR_16_Timers_Array) **New**
   * [ 8. ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex) **New**
-* [Example ISR_Timer_Complex](#example-isr_timer_complex)
+* [Example Change_Interval](#example-change_interval)
 * [Debug Terminal Output Samples](#debug-terminal-output-samples)
   * [1. TimerInterruptTest on ESP8266_NODEMCU_ESP12E](#1-timerinterrupttest-on-esp8266_nodemcu_esp12e)
   * [2. Change_Interval on ESP8266_NODEMCU_ESP12E](#2-change_interval-on-esp8266_nodemcu_esp12e)
@@ -125,7 +125,7 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 
 ## Prerequisites
 
-1. [`Arduino IDE 1.8.16+`](https://www.arduino.cc/en/Main/Software)
+1. [`Arduino IDE 1.8.19+` for Arduino](https://github.com/arduino/Arduino). [![GitHub release](https://img.shields.io/github/release/arduino/Arduino.svg)](https://github.com/arduino/Arduino/releases/latest)
 2. [`ESP8266 Core 3.0.2+`](https://github.com/esp8266/Arduino) for ESP8266-based boards. [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/). To use ESP8266 core 2.7.1+ for LittleFS. 
 3. [`SimpleTimer library`](https://github.com/jfturcot/SimpleTimer) to use with some examples.
 
