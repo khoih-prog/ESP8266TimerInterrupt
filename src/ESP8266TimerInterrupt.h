@@ -66,6 +66,14 @@
   #define TIMER_INTERRUPT_DEBUG      0
 #endif
 
+#if defined(ARDUINO)
+  #if ARDUINO >= 100
+    #include <Arduino.h>
+  #else
+    #include <WProgram.h>
+  #endif
+#endif
+
 #include "TimerInterrupt_Generic_Debug.h"
 
 /* From /arduino-1.8.10/hardware/esp8266com/esp8266/cores/esp8266/esp8266_peri.h
@@ -144,8 +152,7 @@ class ESP8266TimerInterrupt
       _callback   = NULL;
     };
 
-    // frequency (in hertz) and duration (in milliseconds). Duration = 0 or not specified => run indefinitely
-    // No params and duration now. To be addes in the future by adding similar functions here or to esp32-hal-timer.c
+    // frequency (in hertz)
     bool setFrequency(const float& frequency, const timer_callback& callback)
     {
       bool isOKFlag = true;
@@ -188,8 +195,7 @@ class ESP8266TimerInterrupt
       return isOKFlag;
     }
 
-    // interval (in microseconds) and duration (in milliseconds). Duration = 0 or not specified => run indefinitely
-    // No params and duration now. To be addes in the future by adding similar functions here or to esp32-hal-timer.c
+    // interval (in microseconds)
     bool setInterval(const unsigned long& interval, const timer_callback& callback)
     {
       return setFrequency((float) (1000000.0f / interval), callback);
@@ -200,8 +206,7 @@ class ESP8266TimerInterrupt
       return setFrequency(frequency, callback);
     }
 
-    // interval (in microseconds) and duration (in milliseconds). Duration = 0 or not specified => run indefinitely
-    // No params and duration now. To be addes in the future by adding similar functions here or to esp32-hal-timer.c
+    // interval (in microseconds)
     bool attachInterruptInterval(const unsigned long& interval, const timer_callback& callback)
     {
       return setFrequency( (float) ( 1000000.0f / interval), callback);
@@ -217,14 +222,12 @@ class ESP8266TimerInterrupt
       timer1_disable();
     }
 
-    // Duration (in milliseconds). Duration = 0 or not specified => run indefinitely
     void reattachInterrupt()
     {
       if ( (_frequency > 0) && (_timerCount > 0) && (_callback != NULL) )
         setFrequency(_frequency, _callback);
     }
 
-    // Duration (in milliseconds). Duration = 0 or not specified => run indefinitely
     void enableTimer()
     {
       reattachInterrupt();
