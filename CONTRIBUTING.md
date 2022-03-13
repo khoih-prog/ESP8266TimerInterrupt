@@ -30,7 +30,7 @@ Arduino IDE version: v1.8.19
 ESP8266 Core Version v3.0.2
 ESP8266_NODEMCU
 OS: Ubuntu 20.04 LTS
-Linux xy-Inspiron-3593 5.4.0-94-generic #106-Ubuntu SMP Thu Jan 6 23:58:14 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
+Linux xy-Inspiron-3593 5.13.0-35-generic #40~20.04.1-Ubuntu SMP Mon Mar 7 09:18:32 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
 
 Context:
 I encountered a crash while trying to use the Timer Interrupt.
@@ -50,3 +50,4 @@ There are usually some outstanding feature requests in the [existing issues list
 ### Sending Pull Requests
 
 Pull Requests with changes and fixes are also welcome!
+

@@ -10,6 +10,7 @@
 ---
 
 * [Changelog](#changelog)
+  * [Releases v1.6.0](#releases-v160)
   * [Releases v1.5.0](#releases-v150)
   * [Releases v1.4.1](#releases-v141)
   * [Releases v1.4.0](#releases-v140)
@@ -24,6 +25,12 @@
 ---
 
 ## Changelog
+
+### Releases v1.6.0
+
+1. Add example [ISR_16_Timers_Array_OneShot](examples/ISR_16_Timers_Array_OneShot) to demo how to use `one-shot ISR-based timer`
+2. Add example [multiFileProject](examples/multiFileProject) to demo for multiple-file project
+3. Optimize code by using passing by `reference` instead of by `value`
 
 ### Releases v1.5.0
 

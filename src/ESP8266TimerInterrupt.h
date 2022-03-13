@@ -23,7 +23,7 @@
   Based on BlynkTimer.h
   Author: Volodymyr Shymanskyy
 
-  Version: 1.5.0
+  Version: 1.6.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -38,6 +38,7 @@
   1.4.0   K.Hoang      01/06/2021 Add complex examples. Fix compiler errors due to conflict to some libraries.
   1.4.1   K.Hoang      22/11/2021 Tested with core v3.0.2. Add instructions in README.md
   1.5.0   K.Hoang      18/01/2022 Fix `multiple-definitions` linker error. Fix bug and add more accurate but shorter timer
+  1.6.0   K.Hoang      13/02/2022 Add example to demo how to use one-shot ISR-based timers. Optimize code
 *****************************************************************************************************************************/
 
 #pragma once
@@ -50,14 +51,16 @@
 #endif
 
 #ifndef ESP8266_TIMER_INTERRUPT_VERSION
-  #define ESP8266_TIMER_INTERRUPT_VERSION         "ESP8266TimerInterrupt v1.5.0"
+  #define ESP8266_TIMER_INTERRUPT_VERSION         "ESP8266TimerInterrupt v1.6.0"
+
+
+	#define ESP8266_TIMER_INTERRUPT_VERSION_MAJOR     1
+	#define ESP8266_TIMER_INTERRUPT_VERSION_MINOR     6
+	#define ESP8266_TIMER_INTERRUPT_VERSION_PATCH     0
+
+	#define ESP8266_TIMER_INTERRUPT_VERSION_INT      1006000
+
 #endif
-
-#define ESP8266_TIMER_INTERRUPT_VERSION_MAJOR     1
-#define ESP8266_TIMER_INTERRUPT_VERSION_MINOR     5
-#define ESP8266_TIMER_INTERRUPT_VERSION_PATCH     0
-
-#define ESP8266_TIMER_INTERRUPT_VERSION_INT      1005000
 
 #ifndef TIMER_INTERRUPT_DEBUG
   #define TIMER_INTERRUPT_DEBUG      0
@@ -143,7 +146,7 @@ class ESP8266TimerInterrupt
 
     // frequency (in hertz) and duration (in milliseconds). Duration = 0 or not specified => run indefinitely
     // No params and duration now. To be addes in the future by adding similar functions here or to esp32-hal-timer.c
-    bool setFrequency(float frequency, timer_callback callback)
+    bool setFrequency(const float& frequency, const timer_callback& callback)
     {
       bool isOKFlag = true;
       float minFreq = (float) TIM_CLOCK_FREQ / MAX_ESP8266_COUNT;
@@ -187,19 +190,19 @@ class ESP8266TimerInterrupt
 
     // interval (in microseconds) and duration (in milliseconds). Duration = 0 or not specified => run indefinitely
     // No params and duration now. To be addes in the future by adding similar functions here or to esp32-hal-timer.c
-    bool setInterval(unsigned long interval, timer_callback callback)
+    bool setInterval(const unsigned long& interval, const timer_callback& callback)
     {
       return setFrequency((float) (1000000.0f / interval), callback);
     }
 
-    bool attachInterrupt(float frequency, timer_callback callback)
+    bool attachInterrupt(const float& frequency, const timer_callback& callback)
     {
       return setFrequency(frequency, callback);
     }
 
     // interval (in microseconds) and duration (in milliseconds). Duration = 0 or not specified => run indefinitely
     // No params and duration now. To be addes in the future by adding similar functions here or to esp32-hal-timer.c
-    bool attachInterruptInterval(unsigned long interval, timer_callback callback)
+    bool attachInterruptInterval(const unsigned long& interval, const timer_callback& callback)
     {
       return setFrequency( (float) ( 1000000.0f / interval), callback);
     }

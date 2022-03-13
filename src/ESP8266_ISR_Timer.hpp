@@ -23,7 +23,7 @@
   Based on BlynkTimer.h
   Author: Volodymyr Shymanskyy
 
-  Version: 1.5.0
+  Version: 1.6.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -38,6 +38,7 @@
   1.4.0   K.Hoang      01/06/2021 Add complex examples. Fix compiler errors due to conflict to some libraries.
   1.4.1   K.Hoang      22/11/2021 Tested with core v3.0.2. Add instructions in README.md
   1.5.0   K.Hoang      18/01/2022 Fix `multiple-definitions` linker error. Fix bug and add more accurate but shorter timer
+  1.6.0   K.Hoang      13/02/2022 Add example to demo how to use one-shot ISR-based timers. Optimize code
 *****************************************************************************************************************************/
 
 #pragma once
@@ -50,7 +51,15 @@
 #endif
 
 #ifndef ESP8266_TIMER_INTERRUPT_VERSION
-  #define ESP8266_TIMER_INTERRUPT_VERSION       "ESP8266TimerInterrupt v1.4.1"
+  #define ESP8266_TIMER_INTERRUPT_VERSION         "ESP8266TimerInterrupt v1.6.0"
+
+
+	#define ESP8266_TIMER_INTERRUPT_VERSION_MAJOR     1
+	#define ESP8266_TIMER_INTERRUPT_VERSION_MINOR     6
+	#define ESP8266_TIMER_INTERRUPT_VERSION_PATCH     0
+
+	#define ESP8266_TIMER_INTERRUPT_VERSION_INT      1006000
+
 #endif
 
 #include "TimerInterrupt_Generic_Debug.h"
@@ -104,50 +113,50 @@ class ESP8266_ISR_Timer
     // Timer will call function 'f' every 'd' milliseconds forever
     // returns the timer number (numTimer) on success or
     // -1 on failure (f == NULL) or no free timers
-    int IRAM_ATTR setInterval(unsigned long d, timer_callback f);
+    int IRAM_ATTR setInterval(const unsigned long& d, const timer_callback& f);
 
     // Timer will call function 'f' with parameter 'p' every 'd' milliseconds forever
     // returns the timer number (numTimer) on success or
     // -1 on failure (f == NULL) or no free timers
-    int IRAM_ATTR setInterval(unsigned long d, timer_callback_p f, void* p);
+    int IRAM_ATTR setInterval(const unsigned long& d, const timer_callback_p& f, void* p);
 
     // Timer will call function 'f' after 'd' milliseconds one time
     // returns the timer number (numTimer) on success or
     // -1 on failure (f == NULL) or no free timers
-    int IRAM_ATTR setTimeout(unsigned long d, timer_callback f);
+    int IRAM_ATTR setTimeout(const unsigned long& d, const timer_callback& f);
 
     // Timer will call function 'f' with parameter 'p' after 'd' milliseconds one time
     // returns the timer number (numTimer) on success or
     // -1 on failure (f == NULL) or no free timers
-    int IRAM_ATTR setTimeout(unsigned long d, timer_callback_p f, void* p);
+    int IRAM_ATTR setTimeout(const unsigned long& d, const timer_callback_p& f, void* p);
 
     // Timer will call function 'f' every 'd' milliseconds 'n' times
     // returns the timer number (numTimer) on success or
     // -1 on failure (f == NULL) or no free timers
-    int IRAM_ATTR setTimer(unsigned long d, timer_callback f, unsigned n);
+    int IRAM_ATTR setTimer(const unsigned long& d, const timer_callback& f, const unsigned& n);
 
     // Timer will call function 'f' with parameter 'p' every 'd' milliseconds 'n' times
     // returns the timer number (numTimer) on success or
     // -1 on failure (f == NULL) or no free timers
-    int IRAM_ATTR setTimer(unsigned long d, timer_callback_p f, void* p, unsigned n);
+    int IRAM_ATTR setTimer(const unsigned long& d, const timer_callback_p& f, void* p, const unsigned& n);
 
     // updates interval of the specified timer
-    bool IRAM_ATTR changeInterval(unsigned numTimer, unsigned long d);
+    bool IRAM_ATTR changeInterval(const unsigned& numTimer, const unsigned long& d);
 
     // destroy the specified timer
-    void IRAM_ATTR deleteTimer(unsigned numTimer);
+    void IRAM_ATTR deleteTimer(const unsigned& timerId);
 
     // restart the specified timer
-    void IRAM_ATTR restartTimer(unsigned numTimer);
+    void IRAM_ATTR restartTimer(const unsigned& numTimer);
 
     // returns true if the specified timer is enabled
-    bool IRAM_ATTR isEnabled(unsigned numTimer);
+    bool IRAM_ATTR isEnabled(const unsigned& numTimer);
 
     // enables the specified timer
-    void IRAM_ATTR enable(unsigned numTimer);
+    void IRAM_ATTR enable(const unsigned& numTimer);
 
     // disables the specified timer
-    void IRAM_ATTR disable(unsigned numTimer);
+    void IRAM_ATTR disable(const unsigned& numTimer);
 
     // enables all timers
     void IRAM_ATTR enableAll();
@@ -157,15 +166,18 @@ class ESP8266_ISR_Timer
 
     // enables the specified timer if it's currently disabled,
     // and vice-versa
-    void IRAM_ATTR toggle(unsigned numTimer);
+    void IRAM_ATTR toggle(const unsigned& numTimer);
 
     // returns the number of used timers
-    unsigned IRAM_ATTR getNumTimers();
+    int8_t IRAM_ATTR getNumTimers();
 
     // returns the number of available timers
-    unsigned IRAM_ATTR getNumAvailableTimers() 
+    int8_t IRAM_ATTR getNumAvailableTimers() 
     {
-      return MAX_NUMBER_TIMERS - numTimers;
+    	if (numTimers <= 0)
+        return MAX_NUMBER_TIMERS;
+      else 
+        return MAX_NUMBER_TIMERS - numTimers;
     };
 
   private:
@@ -176,10 +188,10 @@ class ESP8266_ISR_Timer
     // low level function to initialize and enable a new timer
     // returns the timer number (numTimer) on success or
     // -1 on failure (f == NULL) or no free timers
-    int IRAM_ATTR setupTimer(unsigned long d, void* f, void* p, bool h, unsigned n);
+    int8_t IRAM_ATTR setupTimer(const unsigned long& d, void* f, void* p, bool h, const unsigned& n);
 
     // find the first available slot
-    int IRAM_ATTR findFirstFreeSlot();
+    int8_t IRAM_ATTR findFirstFreeSlot();
 
     typedef struct 
     {
@@ -197,7 +209,7 @@ class ESP8266_ISR_Timer
     volatile timer_t timer[MAX_NUMBER_TIMERS];
 
     // actual number of timers in use (-1 means uninitialized)
-    volatile int numTimers;
+    volatile int8_t numTimers;
 };
 
 #endif    // ISR_TIMER_GENERIC_HPP

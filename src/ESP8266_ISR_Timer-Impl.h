@@ -23,7 +23,7 @@
   Based on BlynkTimer.h
   Author: Volodymyr Shymanskyy
 
-  Version: 1.5.0
+  Version: 1.6.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -38,6 +38,7 @@
   1.4.0   K.Hoang      01/06/2021 Add complex examples. Fix compiler errors due to conflict to some libraries.
   1.4.1   K.Hoang      22/11/2021 Tested with core v3.0.2. Add instructions in README.md
   1.5.0   K.Hoang      18/01/2022 Fix `multiple-definitions` linker error. Fix bug and add more accurate but shorter timer
+  1.6.0   K.Hoang      13/02/2022 Add example to demo how to use one-shot ISR-based timers. Optimize code
 *****************************************************************************************************************************/
 
 #pragma once
@@ -147,7 +148,7 @@ void IRAM_ATTR ESP8266_ISR_Timer::run()
 
 // find the first available slot
 // return -1 if none found
-int IRAM_ATTR ESP8266_ISR_Timer::findFirstFreeSlot() 
+int8_t IRAM_ATTR ESP8266_ISR_Timer::findFirstFreeSlot() 
 {
   // all slots are used
   if (numTimers >= MAX_NUMBER_TIMERS) 
@@ -169,7 +170,7 @@ int IRAM_ATTR ESP8266_ISR_Timer::findFirstFreeSlot()
 }
 
 
-int IRAM_ATTR ESP8266_ISR_Timer::setupTimer(unsigned long d, void* f, void* p, bool h, unsigned n) 
+int8_t IRAM_ATTR ESP8266_ISR_Timer::setupTimer(const unsigned long& d, void* f, void* p, bool h, const unsigned& n) 
 {
   int freeTimer;
 
@@ -204,37 +205,37 @@ int IRAM_ATTR ESP8266_ISR_Timer::setupTimer(unsigned long d, void* f, void* p, b
 }
 
 
-int IRAM_ATTR ESP8266_ISR_Timer::setTimer(unsigned long d, timer_callback f, unsigned n) 
+int IRAM_ATTR ESP8266_ISR_Timer::setTimer(const unsigned long& d, const timer_callback& f, const unsigned& n) 
 {
   return setupTimer(d, (void *)f, NULL, false, n);
 }
 
-int IRAM_ATTR ESP8266_ISR_Timer::setTimer(unsigned long d, timer_callback_p f, void* p, unsigned n) 
+int IRAM_ATTR ESP8266_ISR_Timer::setTimer(const unsigned long& d, const timer_callback_p& f, void* p, const unsigned& n) 
 {
   return setupTimer(d, (void *)f, p, true, n);
 }
 
-int IRAM_ATTR ESP8266_ISR_Timer::setInterval(unsigned long d, timer_callback f) 
+int IRAM_ATTR ESP8266_ISR_Timer::setInterval(const unsigned long& d, const timer_callback& f) 
 {
   return setupTimer(d, (void *)f, NULL, false, TIMER_RUN_FOREVER);
 }
 
-int IRAM_ATTR ESP8266_ISR_Timer::setInterval(unsigned long d, timer_callback_p f, void* p) 
+int IRAM_ATTR ESP8266_ISR_Timer::setInterval(const unsigned long& d, const timer_callback_p& f, void* p) 
 {
   return setupTimer(d, (void *)f, p, true, TIMER_RUN_FOREVER);
 }
 
-int IRAM_ATTR ESP8266_ISR_Timer::setTimeout(unsigned long d, timer_callback f) 
+int IRAM_ATTR ESP8266_ISR_Timer::setTimeout(const unsigned long& d, const timer_callback& f) 
 {
   return setupTimer(d, (void *)f, NULL, false, TIMER_RUN_ONCE);
 }
 
-int IRAM_ATTR ESP8266_ISR_Timer::setTimeout(unsigned long d, timer_callback_p f, void* p) 
+int IRAM_ATTR ESP8266_ISR_Timer::setTimeout(const unsigned long& d, const timer_callback_p& f, void* p) 
 {
   return setupTimer(d, (void *)f, p, true, TIMER_RUN_ONCE);
 }
 
-bool IRAM_ATTR ESP8266_ISR_Timer::changeInterval(unsigned numTimer, unsigned long d) 
+bool IRAM_ATTR ESP8266_ISR_Timer::changeInterval(const unsigned& numTimer, const unsigned long& d) 
 {
   if (numTimer >= MAX_NUMBER_TIMERS) 
   {
@@ -252,7 +253,7 @@ bool IRAM_ATTR ESP8266_ISR_Timer::changeInterval(unsigned numTimer, unsigned lon
   return false;
 }
 
-void IRAM_ATTR ESP8266_ISR_Timer::deleteTimer(unsigned timerId) 
+void IRAM_ATTR ESP8266_ISR_Timer::deleteTimer(const unsigned& timerId) 
 {
   if (timerId >= MAX_NUMBER_TIMERS) 
   {
@@ -279,7 +280,7 @@ void IRAM_ATTR ESP8266_ISR_Timer::deleteTimer(unsigned timerId)
 
 
 // function contributed by code@rowansimms.com
-void IRAM_ATTR ESP8266_ISR_Timer::restartTimer(unsigned numTimer) 
+void IRAM_ATTR ESP8266_ISR_Timer::restartTimer(const unsigned& numTimer) 
 {
   if (numTimer >= MAX_NUMBER_TIMERS) 
   {
@@ -290,7 +291,7 @@ void IRAM_ATTR ESP8266_ISR_Timer::restartTimer(unsigned numTimer)
 }
 
 
-bool IRAM_ATTR ESP8266_ISR_Timer::isEnabled(unsigned numTimer) 
+bool IRAM_ATTR ESP8266_ISR_Timer::isEnabled(const unsigned& numTimer) 
 {
   if (numTimer >= MAX_NUMBER_TIMERS) 
   {
@@ -301,7 +302,7 @@ bool IRAM_ATTR ESP8266_ISR_Timer::isEnabled(unsigned numTimer)
 }
 
 
-void IRAM_ATTR ESP8266_ISR_Timer::enable(unsigned numTimer) 
+void IRAM_ATTR ESP8266_ISR_Timer::enable(const unsigned& numTimer) 
 {
   if (numTimer >= MAX_NUMBER_TIMERS) 
   {
@@ -312,7 +313,7 @@ void IRAM_ATTR ESP8266_ISR_Timer::enable(unsigned numTimer)
 }
 
 
-void IRAM_ATTR ESP8266_ISR_Timer::disable(unsigned numTimer) 
+void IRAM_ATTR ESP8266_ISR_Timer::disable(const unsigned& numTimer) 
 {
   if (numTimer >= MAX_NUMBER_TIMERS) 
   {
@@ -346,7 +347,7 @@ void IRAM_ATTR ESP8266_ISR_Timer::disableAll()
   }
 }
 
-void IRAM_ATTR ESP8266_ISR_Timer::toggle(unsigned numTimer) 
+void IRAM_ATTR ESP8266_ISR_Timer::toggle(const unsigned& numTimer) 
 {
   if (numTimer >= MAX_NUMBER_TIMERS) 
   {
@@ -357,7 +358,7 @@ void IRAM_ATTR ESP8266_ISR_Timer::toggle(unsigned numTimer)
 }
 
 
-unsigned IRAM_ATTR ESP8266_ISR_Timer::getNumTimers() 
+int8_t IRAM_ATTR ESP8266_ISR_Timer::getNumTimers() 
 {
   return numTimers;
 }
