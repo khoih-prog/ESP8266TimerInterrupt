@@ -22,6 +22,10 @@
 #include "ESP8266TimerInterrupt.h"
 #include "ESP8266_ISR_Timer.h"
 
+void doingSomething1()
+{
+  Serial.println("doingSomething1 triggered");
+}
 
 void setup() 
 {
@@ -38,6 +42,10 @@ void setup()
     Serial.println(ESP8266_TIMER_INTERRUPT_VERSION_MIN_TARGET);
   }
 #endif
+  
+  setupISR();  // in multifileProject.cpp
+
+  ISR_Timer.setTimeout(5000, doingSomething1);
 }
 
 void loop() 
