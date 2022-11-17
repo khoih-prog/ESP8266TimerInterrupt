@@ -11,7 +11,7 @@
   The timer1's 23-bit counter terribly can count only up to 8,388,607. So the timer1 maximum interval is very short.
   Using 256 prescaler, maximum timer1 interval is only 26.843542 seconds !!!
 
-  Now with these new 16 ISR-based timers, the maximum interval is practically unlimited (limited only by unsigned long miliseconds)
+  Now with these new 16 ISR-based timers, the maximum interval is practically unlimited (limited only by unsigned long milliseconds)
   The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
@@ -29,7 +29,7 @@
 
    RPM Measuring uses high frequency hardware timer 1Hz == 1ms) to measure the time from of one rotation, in ms
    then convert to RPM. One rotation is detected by reading the state of a magnetic REED SW or IR LED Sensor
-   Asssuming LOW is active.
+   Assuming LOW is active.
    For example: Max speed is 600RPM => 10 RPS => minimum 100ms a rotation. We'll use 80ms for debouncing
    If the time between active state is less than 8ms => consider noise.
    RPM = 60000 / (rotation time in ms)

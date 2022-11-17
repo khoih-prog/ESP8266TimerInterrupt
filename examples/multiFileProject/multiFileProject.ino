@@ -1,61 +1,59 @@
 /****************************************************************************************************************************
   multiFileProject.ino
-  For ESP32, ESP32_S2, ESP32_S3, ESP32_C3 boards with ESP32 core v2.0.2+
+  For ESP8266 boards
   Written by Khoi Hoang
 
-  Built by Khoi Hoang https://github.com/khoih-prog/ESP32TimerInterrupt
+  Built by Khoi Hoang https://github.com/khoih-prog/ESP8266TimerInterrupt
   Licensed under MIT license
 *****************************************************************************************************************************/
 
 // To demo how to include files in multi-file Projects
 
-#if !defined( ESP32 )
-	#error This code is intended to run on the ESP32 platform! Please check your Tools->Board setting.
+#ifndef ESP8266
+  #error This code is designed to run on ESP8266 platform! Please check your Tools->Board setting.
 #endif
 
-#define ESP32_TIMER_INTERRUPT_VERSION_MIN_TARGET      "ESP32TimerInterrupt v2.3.0"
-#define ESP32_TIMER_INTERRUPT_VERSION_MIN             2003000
+#define ESP8266_TIMER_INTERRUPT_VERSION_MIN_TARGET      "ESP8266TimerInterrupt v1.6.0"
+#define ESP8266_TIMER_INTERRUPT_VERSION_MIN             1006000
 
 #include "multiFileProject.h"
 
 // To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
-#include "ESP32TimerInterrupt.h"
-#include "ESP32_ISR_Timer.h"
+#include "ESP8266TimerInterrupt.h"
+#include "ESP8266_ISR_Timer.h"
 
 void doingSomething1()
 {
-	// Replace or comment out Serial.println() if crashed
-	Serial.println("doingSomething1 triggered");
+  Serial.println("doingSomething1 triggered");
 }
 
 void setup()
 {
-	Serial.begin(115200);
+  Serial.begin(115200);
 
-	while (!Serial && millis() < 5000);
+  while (!Serial && millis() < 5000);
 
-	delay(500);
+  delay(500);
 
-	Serial.println("\nStart multiFileProject");
-	Serial.println(ESP32_TIMER_INTERRUPT_VERSION);
+  Serial.println("\nStart multiFileProject");
+  Serial.println(ESP8266_TIMER_INTERRUPT_VERSION);
 
-#if defined(ESP32_TIMER_INTERRUPT_VERSION_MIN)
+#if defined(ESP8266_TIMER_INTERRUPT_VERSION_MIN)
 
-	if (ESP32_TIMER_INTERRUPT_VERSION_INT < ESP32_TIMER_INTERRUPT_VERSION_MIN)
-	{
-		Serial.print("Warning. Must use this example on Version equal or later than : ");
-		Serial.println(ESP32_TIMER_INTERRUPT_VERSION_MIN_TARGET);
-	}
+  if (ESP8266_TIMER_INTERRUPT_VERSION_INT < ESP8266_TIMER_INTERRUPT_VERSION_MIN)
+  {
+    Serial.print("Warning. Must use this example on Version equal or later than : ");
+    Serial.println(ESP8266_TIMER_INTERRUPT_VERSION_MIN_TARGET);
+  }
 
 #endif
 
-	setupISR();  // in multifileProject.cpp
+  setupISR();  // in multifileProject.cpp
 
-	ISR_Timer.setTimeout(5000, doingSomething1);
+  ISR_Timer.setTimeout(5000, doingSomething1);
 }
 
 void loop()
 {
-	// put your main code here, to run repeatedly:
-	delay(1);
+  // put your main code here, to run repeatedly:
 }
