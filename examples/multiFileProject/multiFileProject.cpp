@@ -29,7 +29,7 @@ void setupISR()
 {
   if (ITimer.attachInterruptInterval(1000 * 1000, TimerHandler))
   {
-    Serial.print(F("Starting ITimer OK")); 
+    Serial.print(F("Starting ITimer OK"));
   }
   else
     Serial.println(F("Can't set ITimer. Select another freq. or timer"));

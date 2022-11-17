@@ -60,8 +60,10 @@ ESP8266Timer ITimer;
 
 void printResult(uint32_t currTime)
 {
-  Serial.print(F("Time = ")); Serial.print(currTime); 
-  Serial.print(F(", TimerCount = ")); Serial.println(TimerCount);
+  Serial.print(F("Time = "));
+  Serial.print(currTime);
+  Serial.print(F(", TimerCount = "));
+  Serial.println(TimerCount);
 }
 
 void TimerHandler()
@@ -79,20 +81,25 @@ void TimerHandler()
 void setup()
 {
   pinMode(LED_BUILTIN, OUTPUT);
-  
+
   Serial.begin(115200);
-  while (!Serial);
 
-  delay(300);
+  while (!Serial && millis() < 5000);
 
-  Serial.print(F("\nStarting Change_Interval on ")); Serial.println(ARDUINO_BOARD);
+  delay(500);
+
+  Serial.print(F("\nStarting Change_Interval on "));
+  Serial.println(ARDUINO_BOARD);
   Serial.println(ESP8266_TIMER_INTERRUPT_VERSION);
-  Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
- 
+  Serial.print(F("CPU Frequency = "));
+  Serial.print(F_CPU / 1000000);
+  Serial.println(F(" MHz"));
+
   // Interval in microsecs
   if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 1000, TimerHandler))
   {
-    Serial.print(F("Starting  ITimer OK, millis() = ")); Serial.println(millis());
+    Serial.print(F("Starting  ITimer OK, millis() = "));
+    Serial.println(millis());
   }
   else
     Serial.println(F("Can't set ITimer. Select another freq. or timer"));
@@ -119,11 +126,12 @@ void loop()
     {
       //setInterval(unsigned long interval, timerCallback callback)
       multFactor = (multFactor + 1) % 2;
-      
+
       ITimer.setInterval(TIMER_INTERVAL_MS * 1000 * (multFactor + 1), TimerHandler);
 
-      Serial.print(F("Changing Interval, Timer = ")); Serial.println(TIMER_INTERVAL_MS * (multFactor + 1));
-      
+      Serial.print(F("Changing Interval, Timer = "));
+      Serial.println(TIMER_INTERVAL_MS * (multFactor + 1));
+
       lastChangeTime = currTime;
     }
   }

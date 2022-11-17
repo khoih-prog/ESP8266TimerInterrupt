@@ -6,8 +6,11 @@
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](#Contributing)
 [![GitHub issues](https://img.shields.io/github/issues/khoih-prog/ESP8266TimerInterrupt.svg)](http://github.com/khoih-prog/ESP8266TimerInterrupt/issues)
 
+
 <a href="https://www.buymeacoffee.com/khoihprog6" title="Donate to my libraries using BuyMeACoffee"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Donate to my libraries using BuyMeACoffee" style="height: 50px !important;width: 181px !important;" ></a>
 <a href="https://www.buymeacoffee.com/khoihprog6" title="Donate to my libraries using BuyMeACoffee"><img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-orange.svg?logo=buy-me-a-coffee&logoColor=FFDD00" style="height: 20px !important;width: 200px !important;" ></a>
+<a href="https://profile-counter.glitch.me/khoih-prog/count.svg" title="Total khoih-prog Visitor count"><img src="https://profile-counter.glitch.me/khoih-prog/count.svg" style="height: 30px;width: 200px;"></a>
+<a href="https://profile-counter.glitch.me/khoih-prog-ESP8266TimerInterrupt/count.svg" title="ESP8266TimerInterrupt Visitor count"><img src="https://profile-counter.glitch.me/khoih-prog-ESP8266TimerInterrupt/count.svg" style="height: 30px;width: 200px;"></a>
 
 ---
 ---
@@ -180,14 +183,14 @@ The current library implementation, using `xyz-Impl.h` instead of standard `xyz.
 
 You can use
 
-```
+```cpp
 #include "ESP8266TimerInterrupt.h"             //https://github.com/khoih-prog/ESP8266TimerInterrupt
 #include "ESP8266_ISR_Timer.hpp"               //https://github.com/khoih-prog/ESP8266TimerInterrupt
 ```
 
 in many files. But be sure to use the following `#include <ESP8266_ISR_Timer.h>` **in just 1 `.h`, `.cpp` or `.ino` file**, which must **not be included in any other file**, to avoid `Multiple Definitions` Linker Error
 
-```
+```cpp
 // To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
 #include "ESP8266_ISR_Timer.h"                //https://github.com/khoih-prog/ESP8266TimerInterrupt
 ```
@@ -260,7 +263,7 @@ Using 256 prescaler, maximum Timer1 interval is only 26.843542 seconds !!!
 
 ### 1.1 Init Hardware Timer
 
-```
+```cpp
 // Select a Timer Clock
 #define USING_TIM_DIV1                false           // for shortest and most accurate timer
 #define USING_TIM_DIV16               false           // for medium time and medium accurate timer
@@ -274,7 +277,7 @@ ESP8266Timer ITimer;
 
 Use one of these functions with **interval in unsigned long milliseconds**
 
-```
+```cpp
 // interval (in microseconds)
 bool setInterval(unsigned long interval, timer_callback callback)
 
@@ -284,7 +287,7 @@ bool attachInterruptInterval(unsigned long interval, timer_callback callback)
 
 as follows
 
-```
+```cpp
 void IRAM_ATTR TimerHandler()
 {
   // Doing something here inside ISR
@@ -311,7 +314,7 @@ void setup()
 
 Use one of these functions with **frequency in float Hz**
 
-```
+```cpp
 // frequency (in hertz)
 bool setFrequency(float frequency, timer_callback callback)
 
@@ -321,7 +324,7 @@ bool attachInterrupt(float frequency, timer_callback callback)
 
 as follows
 
-```
+```cpp
 void TimerHandler()
 {
   // Doing something here inside ISR
@@ -350,7 +353,7 @@ The 16 ISR_based Timers, designed for long timer intervals, only support using *
 
 ### 2.2 Init Hardware Timer and ISR-based Timer
 
-```
+```cpp
 // Select a Timer Clock
 #define USING_TIM_DIV1                false           // for shortest and most accurate timer
 #define USING_TIM_DIV16               false           // for medium time and medium accurate timer
@@ -368,7 +371,7 @@ ESP8266_ISR_Timer ISR_Timer;
 
 ### 2.3 Set Hardware Timer Interval and attach Timer Interrupt Handler functions
 
-```
+```cpp
 void IRAM_ATTR TimerHandler()
 {
   ISR_timer.run();

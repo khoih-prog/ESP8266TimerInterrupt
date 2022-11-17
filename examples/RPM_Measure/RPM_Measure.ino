@@ -91,8 +91,10 @@ void IRAM_ATTR TimerHandler()
     avgRPM = ( 2 * avgRPM + RPM) / 3,
 
 #if (LOCAL_DEBUG > 0)
-      Serial.print("RPM = "); Serial.print(avgRPM);
-      Serial.print(", rotationTime ms = "); Serial.println(rotationTime * TIMER_INTERVAL_MS);
+    Serial.print("RPM = ");
+    Serial.print(avgRPM);
+    Serial.print(", rotationTime ms = ");
+    Serial.println(rotationTime * TIMER_INTERVAL_MS);
 #endif
 
     rotationTime = 0;
@@ -107,11 +109,14 @@ void IRAM_ATTR TimerHandler()
   {
     // If idle, set RPM to 0, don't increase rotationTime
     RPM = 0;
-    
-#if (LOCAL_DEBUG > 0)   
-    Serial.print("RPM = "); Serial.print(RPM); Serial.print(", rotationTime = "); Serial.println(rotationTime);
+
+#if (LOCAL_DEBUG > 0)
+    Serial.print("RPM = ");
+    Serial.print(RPM);
+    Serial.print(", rotationTime = ");
+    Serial.println(rotationTime);
 #endif
-    
+
     rotationTime = 0;
   }
   else
@@ -123,18 +128,23 @@ void IRAM_ATTR TimerHandler()
 void setup()
 {
   Serial.begin(115200);
-  while (!Serial);
 
-  delay(200);
+  while (!Serial && millis() < 5000);
 
-  Serial.print(F("\nStarting RPM_Measure on ")); Serial.println(ARDUINO_BOARD);
+  delay(500);
+
+  Serial.print(F("\nStarting RPM_Measure on "));
+  Serial.println(ARDUINO_BOARD);
   Serial.println(ESP8266_TIMER_INTERRUPT_VERSION);
-  Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
+  Serial.print(F("CPU Frequency = "));
+  Serial.print(F_CPU / 1000000);
+  Serial.println(F(" MHz"));
 
   // Interval in microsecs
   if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 1000, TimerHandler))
   {
-    Serial.print(F("Starting ITimer OK, millis() = ")); Serial.println(millis());
+    Serial.print(F("Starting ITimer OK, millis() = "));
+    Serial.println(millis());
   }
   else
     Serial.println(F("Can't set ITimer. Select another freq. or timer"));

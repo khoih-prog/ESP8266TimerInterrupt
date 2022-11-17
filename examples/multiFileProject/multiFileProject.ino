@@ -27,28 +27,33 @@ void doingSomething1()
   Serial.println("doingSomething1 triggered");
 }
 
-void setup() 
+void setup()
 {
   Serial.begin(115200);
-  while (!Serial);
-  
+
+  while (!Serial && millis() < 5000);
+
+  delay(500);
+
   Serial.println("\nStart multiFileProject");
   Serial.println(ESP8266_TIMER_INTERRUPT_VERSION);
 
 #if defined(ESP8266_TIMER_INTERRUPT_VERSION_MIN)
+
   if (ESP8266_TIMER_INTERRUPT_VERSION_INT < ESP8266_TIMER_INTERRUPT_VERSION_MIN)
   {
     Serial.print("Warning. Must use this example on Version equal or later than : ");
     Serial.println(ESP8266_TIMER_INTERRUPT_VERSION_MIN_TARGET);
   }
+
 #endif
-  
+
   setupISR();  // in multifileProject.cpp
 
   ISR_Timer.setTimeout(5000, doingSomething1);
 }
 
-void loop() 
+void loop()
 {
   // put your main code here, to run repeatedly:
 }
